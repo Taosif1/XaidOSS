@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dimden.dev/japanese/grammar/verbs.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:48 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese verb conjugations quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet">    
+    <link rel="stylesheet" href="https://dimden.dev/japanese/grammar/quiz.css">
+    <meta name="og:title" content="Japanese verb conjugations quiz">
+    <meta name="og:description" content="Quiz made to study verb conjugations.">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137155489-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-137155489-1');
+    </script>
+</head>
+<body>
+    <div id="main-page">
+        <h1>Japanese verb conjugations quiz</h1>
+        <!-- <p>Quiz made to complement Organic Japanese with Cure Dolly videos. For example ーて form is for <a href="https://www.youtube.com/watch?v=GzEVLMDC8nw&list=PLg9uYxuZf8x_A-vcqqyOFZu06WlhnypWj&index=5" target="_blank">Lesson 5</a>.</p> -->
+        <p>Quiz made to study verb conjugations. Select forms you want to study below. This quiz is good for memorizing, but you probably need some other resource for learning.</p>
+        <p>You can also select how many verbs do you want to quiz, they'll be randomly chosen from database of 400+ verbs.</p>
+        <p style="font-size:12px">UI inspired by <a href="https://kana-quiz.tofugu.com/" target="_blank">Tofugu's Kana Quiz</a>, verb data is from <a href="https://www.japaneseverbconjugator.com/" target="_blank">Ultra Handy Japanese Verb Conjugator</a>, quiz created by <a href="https://dimden.dev/" target="_blank">dimden</a>.</p>    
+        <br>
+        <div id="selectors">
+            <span>(<b>食べる</b> is just an example)</span>
+            <br><br>
+            <table>
+                <tbody>
+                    <!-- Te form -->
+                    <tr>
+                        <th colspan="2" class="info-label">Te form</th>
+                        <td colspan="2">
+                            <input type="checkbox" id="te-form">
+                            <label for="te-form">食べて</label>
+                        </td>
+                    </tr>
+                    <!-- Present Indicative -->
+                    <tr>
+                        <th colspan="2" rowspan="2"></th>
+                        <th>Positive</th>
+                        <th>Negative</th>
+                    </tr>
+                    <tr>
+                        <td class="meaning">eat, will eat</td>
+                        <td class="meaning">don't eat, won't eat</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Present Indicative  <a onclick="showFormDefinition('present-indicative')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="present-indicative-plain-positive" disabled>
+                            <label for="present-indicative-plain-positive">食べる</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="present-indicative-plain-negative">
+                            <label for="present-indicative-plain-negative">食べない</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="present-indicative-polite-positive">
+                            <label for="present-indicative-polite-positive">食べます</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="present-indicative-polite-negative">
+                            <label for="present-indicative-polite-negative">食べません</label>
+                        </td>
+                    </tr>
+                    <!-- Presumptive -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">let's eat, will probably eat</td>
+                        <td class="meaning">let's not eat, probably won't eat</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Presumptive <a onclick="showFormDefinition('presumptive')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="presumptive-plain-positive">
+                            <label for="presumptive-plain-positive">食べるだろう</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="presumptive-plain-negative">
+                            <label for="presumptive-plain-negative">食べないだろう</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="presumptive-polite-positive">
+                            <label for="presumptive-polite-positive">食べるでしょう</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="presumptive-polite-negative">
+                            <label for="presumptive-polite-negative">食べないでしょう</label>
+                        </td>
+                    </tr>
+                    <!-- Imperative -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">eat!</td>
+                        <td class="meaning">don't eat!</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Imperative <a onclick="showFormDefinition('imperative')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="imperative-plain-positive">
+                            <label for="imperative-plain-positive">食べろ</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="imperative-plain-negative">
+                            <label for="imperative-plain-negative">食べるな</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="imperative-polite-positive">
+                            <label for="imperative-polite-positive">食べてください</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="imperative-polite-negative">
+                            <label for="imperative-polite-negative">食べないでください</label>
+                        </td>
+                    </tr>
+                    <!-- Past Indicative -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">ate, have eaten</td>
+                        <td class="meaning">didn't eat, haven't eaten</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Past Indicative <a onclick="showFormDefinition('past-indicative')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="past-indicative-plain-positive">
+                            <label for="past-indicative-plain-positive">食べた</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="past-indicative-plain-negative">
+                            <label for="past-indicative-plain-negative">食べなかった</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="past-indicative-polite-positive">
+                            <label for="past-indicative-polite-positive">食べました</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="past-indicative-polite-negative">
+                            <label for="past-indicative-polite-negative">食べませんでした</label>
+                        </td>
+                    </tr>
+                    <!-- Past Presumptive -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">probably ate</td>
+                        <td class="meaning">probably didn't eat</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Past Presumptive <a onclick="showFormDefinition('past-presumptive')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="past-presumptive-plain-positive">
+                            <label for="past-presumptive-plain-positive">食べただろう</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="past-presumptive-plain-negative">
+                            <label for="past-presumptive-plain-negative">食べなかっただろう</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="past-presumptive-polite-positive">
+                            <label for="past-presumptive-polite-positive">食べたでしょう</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="past-presumptive-polite-negative">
+                            <label for="past-presumptive-polite-negative">食べなかったでしょう</label>
+                        </td>
+                    </tr>
+                    <!-- Present Progressive -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">eating</td>
+                        <td class="meaning">not eating</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Present Progressive <a onclick="showFormDefinition('present-progressive')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="present-progressive-plain-positive">
+                            <label for="present-progressive-plain-positive">食べている</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="present-progressive-plain-negative">
+                            <label for="present-progressive-plain-negative">食べていない</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="present-progressive-polite-positive">
+                            <label for="present-progressive-polite-positive">食べています</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="present-progressive-polite-negative">
+                            <label for="present-progressive-polite-negative">食べていません</label>
+                        </td>
+                    </tr>
+                    <!-- Past Progressive -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">was eating</td>
+                        <td class="meaning">wasn't eating</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Past Progressive <a onclick="showFormDefinition('past-progressive')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="past-progressive-plain-positive">
+                            <label for="past-progressive-plain-positive">食べていた</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="past-progressive-plain-negative">
+                            <label for="past-progressive-plain-negative">食べていなかった</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="past-progressive-polite-positive">
+                            <label for="past-progressive-polite-positive">食べていました</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="past-progressive-polite-negative">
+                            <label for="past-progressive-polite-negative">食べていませんでした</label>
+                        </td>
+                    </tr>
+                    <!-- Potential -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">can eat</td>
+                        <td class="meaning">can't eat</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Potential <a onclick="showFormDefinition('potential')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="potential-plain-positive">
+                            <label for="potential-plain-positive">食べられる</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="potential-plain-negative">
+                            <label for="potential-plain-negative">食べられない</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="potential-polite-positive">
+                            <label for="potential-polite-positive">食べられます</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="potential-polite-negative">
+                            <label for="potential-polite-negative">食べられません</label>
+                        </td>
+                    </tr>
+                    <!-- Causative -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">make eat</td>
+                        <td class="meaning">not make eat</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Causative <a onclick="showFormDefinition('causative')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="causative-plain-positive">
+                            <label for="causative-plain-positive">食べさせる</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="causative-plain-negative">
+                            <label for="causative-plain-negative">食べさせない</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="causative-polite-positive">
+                            <label for="causative-polite-positive">食べさせます</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="causative-polite-negative">
+                            <label for="causative-polite-negative">食べさせません</label>
+                        </td>
+                    </tr>
+                    <!-- Passive -->
+                    <tr>
+                        <th colspan="2"></th>
+                        <td class="meaning">be eaten</td>
+                        <td class="meaning">not be eaten</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="info-label">Passive <a onclick="showFormDefinition('passive')">(?)</a></th>
+                        <th>Plain</th>
+                        <td>
+                            <input type="checkbox" id="passive-plain-positive">
+                            <label for="passive-plain-positive">食べられる</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="passive-plain-negative">
+                            <label for="passive-plain-negative">食べられない</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Polite</th>
+                        <td>
+                            <input type="checkbox" id="passive-polite-positive">
+                            <label for="passive-polite-positive">食べられます</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="passive-polite-negative">
+                            <label for="passive-polite-negative">食べられません</label>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div>
+            <input type="checkbox" id="show-answer-on-wrong-input" data-no-color="1">
+            <label for="show-answer-on-wrong-input">Show answer on wrong input</label>
+        </div>
+        <br>
+        <input type="number" id="amount" min="1" max="400" value="20" style="margin-right: 5px;margin-left: 5px; width: 40px">
+        <button id="start-quiz" style="margin-left: 5px" disabled>Start Quiz!</button>
+        <br><br><br><br><br>
+    </div>
+    <div id="quiz-page" style="display: none">
+        <h1 id="type-in">Type in the answers</h1>
+        <ul>
+            <li>Type your answer in romaji/hiragana/katakana (don't use kanji) in the card's text field</li>
+            <li>Press ENTER to submit</li>
+            <li>Repeat for as many cards as you can</li>
+            <li>You can try as many times as you want unless you enable option to show answer on wrong input</li>
+            <li>When you're done press the "Finish Quiz" button at the bottom</li>
+        </ul>
+        <br>
+        <div id="cards"></div>
+        <br>
+        <button id="finish-quiz">Finish Quiz</button>
+        <br><br><br><br><br>
+    </div>
+    <div id="results-page" style="display: none">
+        <h1>Results</h1>
+        <p style="font-size:24px">Overall Correct: <span id="overcall-correct"></span></p>
+        <div id="results"></div>
+        <br>
+        <button id="back-home">Home</button>
+        <button id="restart-quiz">Restart Quiz</button>
+        <br><br><br><br><br>
+    </div>
+    <script src="https://unpkg.com/wanakana@5.1.0/wanakana.min.js"></script>
+    <script src="https://dimden.dev/japanese/grammar/quiz.js?1"></script>
+    <script>
+        const formDefinitions = {
+            "te-form": "Japanese te-form is one of the most common Japanese verb conjugations because it turns a normal verb into an “-ing” form verb. In English, te-form Japanese would be called the \"present progressive\".",
+            "present-indicative": "The indicative mood is for ordinary, objective statements of fact. The present tense is used for incomplete habitual actions as well as for future intentions.",
+            "presumptive": "Generally used to express probability, belief or intention. Can also be used to express intention as in \"Lets...\"",
+            "imperative": "Used to give commands or make requests. The negative imperative is used to give a strong prohibition. Generally too abrupt for most situations other than telling off children or husbands but can be softened by adding please (kudasai).",
+            "past-indicative": "The past indicative mood is actions completed in the past (I ate, I worked etc) and also for the equivalent of the present perfect in English (I have eaten, I have worked etc)",
+            "past-presumptive": "Generally used to express probability or belief regarding the past.",
+            "present-progressive": "Used for action in progress, continuous action, state of being. Also used to express the same meaning as the English present perfect. Unlike English it cannot be used for future intention (tomorrow Im eating out, Im going out later etc).",
+            "past-progressive": "Used for past continuous action or state of being.",
+            "potential": "Used to express ability or possibility.",
+            "causative": "Used to express the idea of making someone do something.",
+            "passive": "Used to express the idea of something being done to someone."
+        }
+        function showFormDefinition(form) {
+            alert(formDefinitions[form]);
+        }
+
+        let showAnswerOnWrongInput = document.getElementById("show-answer-on-wrong-input");
+        let teForm = document.getElementById("te-form");
+        let inputs = Array.from(document.getElementsByTagName('input')).filter(i => i.type === "checkbox").slice(1, -1);
+        let checked = JSON.parse(localStorage.getItem("checked") || "{}");
+        Array.from(document.getElementsByTagName('input')).forEach(i => {
+            if(i.dataset.noColor) return;
+
+            if(i.type === "checkbox") {
+                if(checked[i.id]) {
+                    i.checked = true;
+                    i.parentElement.classList.add("selected");
+                }
+            }
+            i.addEventListener('change', e => {
+                if(e.target.type === "checkbox") {
+                    if(e.target.checked) {
+                        e.target.parentElement.classList.add("selected");
+                        checked[e.target.id] = true;
+                    } else {
+                        e.target.parentElement.classList.remove("selected");
+                        delete checked[e.target.id];
+                    }
+                    localStorage.setItem("checked", JSON.stringify(checked));
+                }
+            })
+        });
+        if(!localStorage.verbData || !localStorage.verbUpdate || Date.now() - +localStorage.verbUpdate > 60000 * 60 * 24) fetch("./verbs.min.json").then(i => i.json()).then(i => {
+            window.verbs = i;
+            document.getElementById("start-quiz").disabled = false;
+            localStorage.verbData = JSON.stringify(i);
+            localStorage.verbUpdate = Date.now();
+        });
+        else {
+            window.verbs = JSON.parse(localStorage.verbData);
+            document.getElementById("start-quiz").disabled = false;
+        }
+        function shuffle(array) {
+            let currentIndex = array.length,  randomIndex;
+
+            // While there remain elements to shuffle.
+            while (currentIndex > 0) {
+
+                // Pick a remaining element.
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]];
+            }
+
+            return array;
+        }
+
+        document.getElementById("back-home").addEventListener("click", () => {
+            document.getElementById("main-page").style.display = "block";
+            document.getElementById("quiz-page").style.display = "none";
+            document.getElementById("results-page").style.display = "none";
+
+            location.hash = "";
+        });
+        document.getElementById("restart-quiz").addEventListener("click", () => {
+            document.getElementById("start-quiz").click();
+        });
+        document.getElementById("start-quiz").addEventListener("click", () => {
+            let amount = document.getElementById("amount").value;
+            let selectedVerbs = [];
+            for(let verb of verbs) {
+                if(teForm.checked && verb.te) {
+                    let o = Object.assign({}, verb.te);
+                    o.main = verb.presentIndicative.positive.plain;
+                    o.main.meaning = verb.presentIndicative.positive.meaning;
+                    o.form = "Te form";
+                    o.simpleForm = "te-form";
+                    selectedVerbs.push(o);
+                }
+
+                for(let i of inputs) {
+                    let positive = i.id.includes("positive");
+                    let plain = i.id.includes("plain");
+                    let name = i.id.split("-").slice(0, -2);
+                    if(name[1]) {
+                        name = name[0] + name[1][0].toUpperCase() + name[1].slice(1);
+                    } else {
+                        name = name[0];
+                    }
+                    if(i.checked && verb[name] && verb[name][positive ? "positive" : "negative"] && verb[name][positive ? "positive" : "negative"][plain ? "plain" : "polite"]) {
+                        let o = Object.assign({}, verb[name][positive ? "positive" : "negative"][plain ? "plain" : "polite"]);
+                        if(verb[name][positive ? "positive" : "negative"].meaning) o.meaning = verb[name][positive ? "positive" : "negative"].meaning;
+                        o.main = verb.presentIndicative.positive.plain;
+                        o.main.meaning = verb.presentIndicative.positive.meaning;
+                        o.form = (plain ? "Plain " : "Polite ") + (positive ? "positive " : "negative ") + i.id.split("-").slice(0, -2).join(" ");
+                        o.simpleForm = i.id.split("-").slice(0, -2).join("-");
+                        selectedVerbs.push(o);
+                    }
+                }
+            }
+
+            selectedVerbs = shuffle(selectedVerbs).slice(0, amount);
+
+            if(!selectedVerbs.some(v => v.main.word === "する")) {
+                let verb = verbs.find(i => i.presentIndicative.positive.plain.word === "する");
+                if(teForm.checked && verb.te) {
+                    let o = Object.assign({}, verb.te);
+                    o.main = verb.presentIndicative.positive.plain;
+                    o.main.meaning = verb.presentIndicative.positive.meaning;
+                    o.form = "Te form";
+                    o.simpleForm = "te-form";
+                    if(Math.random() < 0.10) selectedVerbs.push(o);
+                }
+                let inserted = false;
+                for(let i of inputs) {
+                    let positive = i.id.includes("positive");
+                    let plain = i.id.includes("plain");
+                    let name = i.id.split("-").slice(0, -2);
+                    if(name[1]) {
+                        name = name[0] + name[1][0].toUpperCase() + name[1].slice(1);
+                    } else {
+                        name = name[0];
+                    }
+                    if(i.checked && verb[name] && verb[name][positive ? "positive" : "negative"] && verb[name][positive ? "positive" : "negative"][plain ? "plain" : "polite"]) {
+                        let o = Object.assign({}, verb[name][positive ? "positive" : "negative"][plain ? "plain" : "polite"]);
+                        if(verb[name][positive ? "positive" : "negative"].meaning) o.meaning = verb[name][positive ? "positive" : "negative"].meaning;
+                        o.main = verb.presentIndicative.positive.plain;
+                        o.main.meaning = verb.presentIndicative.positive.meaning;
+                        o.form = (plain ? "Plain " : "Polite ") + (positive ? "positive " : "negative ") + i.id.split("-").slice(0, -2).join(" ");
+                        o.simpleForm = i.id.split("-").slice(0, -2).join("-");
+                        if(Math.random() < 0.10 && !inserted) {
+                            inserted = true;
+                            selectedVerbs.unshift(o);
+                        }
+                    }
+                }
+            }
+            if(!selectedVerbs.some(v => v.main.word === "来る")) {
+                let verb = verbs.find(i => i.presentIndicative.positive.plain.word === "来る");
+                if(teForm.checked && verb.te) {
+                    let o = Object.assign({}, verb.te);
+                    o.main = verb.presentIndicative.positive.plain;
+                    o.main.meaning = verb.presentIndicative.positive.meaning;
+                    o.form = "Te form";
+                    o.simpleForm = "te-form";
+                    if(Math.random() < 0.10) selectedVerbs.push(o);
+                }
+                let inserted = false;
+                for(let i of inputs) {
+                    let positive = i.id.includes("positive");
+                    let plain = i.id.includes("plain");
+                    let name = i.id.split("-").slice(0, -2);
+                    if(name[1]) {
+                        name = name[0] + name[1][0].toUpperCase() + name[1].slice(1);
+                    } else {
+                        name = name[0];
+                    }
+                    if(i.checked && verb[name] && verb[name][positive ? "positive" : "negative"] && verb[name][positive ? "positive" : "negative"][plain ? "plain" : "polite"]) {
+                        let o = Object.assign({}, verb[name][positive ? "positive" : "negative"][plain ? "plain" : "polite"]);
+                        if(verb[name][positive ? "positive" : "negative"].meaning) o.meaning = verb[name][positive ? "positive" : "negative"].meaning;
+                        o.main = verb.presentIndicative.positive.plain;
+                        o.main.meaning = verb.presentIndicative.positive.meaning;
+                        o.form = (plain ? "Plain " : "Polite ") + (positive ? "positive " : "negative ") + i.id.split("-").slice(0, -2).join(" ");
+                        o.simpleForm = i.id.split("-").slice(0, -2).join("-");
+                        if(Math.random() < 0.10 && !inserted) {
+                            inserted = true;
+                            selectedVerbs.unshift(o);
+                        }
+                    }
+                }
+            }
+            selectedVerbs = shuffle(selectedVerbs);
+
+            if(selectedVerbs.length === 0) {
+                alert("You didn't select any verb forms!");
+                return;
+            }
+
+            document.getElementById("main-page").style.display = "none";
+            document.getElementById("quiz-page").style.display = "block";
+            document.getElementById("results-page").style.display = "none";
+
+            location.hash = "#quiz-page";
+
+            initSession();
+
+            let cards = document.getElementById("cards");
+            cards.innerHTML = "";
+            for(let verb of selectedVerbs) {
+                let card = renderCard(verb);
+
+                cards.appendChild(card);
+            }
+        });
+        
+        document.getElementById("finish-quiz").addEventListener("click", () => {
+            if(sessionCards.some(i => !i.correct && !i.rip)) {
+                if(!confirm("You have some incorrect answers, are you sure you want to finish the quiz?")) return;
+            }
+            document.getElementById("main-page").style.display = "none";
+            document.getElementById("quiz-page").style.display = "none";
+            document.getElementById("results-page").style.display = "block";
+
+            location.hash = "#results-page";
+
+            let results = document.getElementById("results");
+            results.innerHTML = "";
+
+            let forms = {};
+            for(let card of sessionCards) {
+                let formCategory = document.getElementById(`result-${card.verb.form}`);
+                if(!formCategory) {
+                    formCategory = document.createElement("div");
+                    formCategory.id = `result-${card.verb.form}`;
+                    formCategory.classList.add("form-category");
+                    formCategory.innerHTML = `<h2>${card.verb.form} - <span class="category-stat"></span></h2>`;
+                    results.appendChild(formCategory);
+
+                    forms[card.verb.form] = [card.correct];
+                } else {
+                    forms[card.verb.form].push(card.correct);
+                }
+                let element = document.createElement("div");
+                element.classList.add("result");
+                element.innerHTML = /*html*/`
+                    <span class="result-correct">${card.correct ? "✅" : "❌"}</span>
+                    <span class="result-verb">${card.verb.word}</span>
+                    ${!showAnswerOnWrongInput.checked ? `<span class="result-attempts">(${card.attempts} att${card.attempts !== 1 ? 's' : ''}.)</span>` : ''}
+                `;
+
+                formCategory.appendChild(element);
+            }
+            
+            document.getElementById("overcall-correct").innerText = `${sessionCards.filter(i => i.correct).length}/${sessionCards.length} (${Math.round(sessionCards.filter(i => i.correct).length / sessionCards.length * 100)}%)`;
+            for(let form in forms) {
+                let category = document.getElementById(`result-${form}`);
+                category.querySelector(".category-stat").innerText = `${forms[form].filter(i => i).length}/${forms[form].length} (${Math.round(forms[form].filter(i => i).length / forms[form].length * 100)}%)`;
+            }
+        });
+
+        if(location.hash === "#quiz-page" || location.hash === "#results-page") {
+            location.hash = "";
+        }
+        window.addEventListener("hashchange", () => {
+            if(location.hash === "#quiz-page") {
+                let cards = document.getElementById("cards");
+                if(cards.childElementCount === 0) {
+                    return location.hash = "";
+                }
+                document.getElementById("main-page").style.display = "none";
+                document.getElementById("quiz-page").style.display = "block";
+                document.getElementById("results-page").style.display = "none";
+            } else if(location.hash === "#results-page") {
+                document.getElementById("main-page").style.display = "none";
+                document.getElementById("quiz-page").style.display = "none";
+                document.getElementById("results-page").style.display = "block";
+            } else {
+                document.getElementById("main-page").style.display = "block";
+                document.getElementById("quiz-page").style.display = "none";
+                document.getElementById("results-page").style.display = "none";
+            }
+        });
+    </script>
+</body>
+
+<!-- Mirrored from dimden.dev/japanese/grammar/verbs.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:48 GMT -->
+</html>

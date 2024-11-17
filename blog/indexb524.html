@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from dimden.dev/blog/?id=10-making-tetris-twitter-bot-with-node-js by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:30 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <meta name="description" content="My website and blog.">
+    <meta name="keywords" content="dimden, JS, JavaScript, Eff the cops, discord, nes, emulators">
+    <meta name="author" content="dimden">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-137155489-1"></script>
+<!-- <script async src="https://arc.io/widget.min.js#PtWkKp1P"></script> -->
+<!-- <script data-ad-client="ca-pub-8494581286071468" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-137155489-1');
+</script>
+
+    <link rel="stylesheet" href="../stylesheet.css">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+    <style>
+        #content {
+            font-family: "MS UI Gothic", Tahoma, sans-serif !important;
+            font-size: 105%;
+        }
+        #date {
+            color: #2e8579;
+            font-family: "MS Gothic", Tahoma, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<!--<h1 id="logo" onclick="window.location.href =`/`;">DIM<letter id="logo-d">D</letter>E<letter id="logo-n">N</letter></h1>-->
+<a href="../index.html">
+    <img id="logo" src="../logo.png">
+</a>
+<script src="../logo.js"></script>
+<hr>
+<!--BLOG-->
+<div id="blog"><title>Making Tetris in Twitter with Node.js</title>
+<link rel="stylesheet" href="../highlight/styles/atom-one-dark.css">
+<h1>Making Tetris in Twitter with Node.js</h1>
+<span id="date">Posted on Tuesday, 17th of August 2021</span>
+<br>
+<br>
+<span id="content">
+	<p>
+		When I saw <a href="https://twitter.com/SnakeGameBot">Twitter Plays Snake</a> bot, I knew I should create something similar to that.<br>It took me a while to think of game, and at first I made Blackjack, but it didn't gain any attention so my second attempt was Tetris, and seems like people really love it. <a href="https://twitter.com/TwittTetris">Check it out!</a><br>
+		So, TL;DR: you can control how pieces fall by doing something to a tweet: comment to make it move left, retweet to rotate it and like to move it right.
+	</p>
+	<p>
+		<h3>Step 1) Get Developer account</h3>
+		So I created a new Twitter account, went to Developer Portal and, ugh, you must write down everything about your future project. It was a bit embarrassing and I wrote that I want to make a game where people can control it by comments, likes and retweets blah blah blah.<br>They emailed me with this:<br><br>
+		<img src="../../lune.dimden.dev/b1cf0b6c4a.png" style="filter: invert(1);border: solid 1px rgb(240,105,153); max-width: 100%;"/><br><br>
+		Mmm, I saw the light green text, I guess it was the info they still needed.<br><br>
+		I replied:<br><br>
+		<img src="../../lune.dimden.dev/dacf9dd646.png" style="filter: invert(1);border: solid 1px rgb(240,105,153); max-width: 100%;"/><br><br>
+		And on next day:<br><br>
+		<img src="../../lune.dimden.dev/315e75f5c7.png" style="filter: invert(1);border: solid 1px rgb(240,105,153); max-width: 100%;" /><br><br>
+		Yay, now time to suffer and learn how API works.
+		<br>
+	</p>
+	<p>
+		<h3>Step 2) Post your first 'Hello, world!'.</h3>
+		Yeah, it sounds really simple, but it actually took me a day of pain.<br>
+		I was searching for good npm libraries for Twitter but for some reason all of them were saying that my credentials can't post tweets. I changed rights to "Read, Write, and Direct Messages" and it still didn't want to work!!!!!!<br>
+		All tutorials in internet were just saying <i>"lol just put in your key and secret key in and it'll start working"</i>, and then I've found out about 3-legged OAuth and implemented it to get access token to only realize it was all for nothing because you can get Access Token and Secret just by getting it in settings, god damn it.
+		<br><br>
+		I ended up using <code>twitter-api-v2</code> library. And finally, the "Hello, world!" was posted:
+		<br>
+		<pre><code>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">Twitter</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;twitter-api-v2&#x27;</span>;
+
+<span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Twitter</span>.<span class="hljs-title function_">default</span>({
+	<span class="hljs-attr">appKey</span>: <span class="hljs-string">&#x27;consumer key&#x27;</span>,
+	<span class="hljs-attr">appSecret</span>: <span class="hljs-string">&#x27;consumer secret&#x27;</span>,
+	<span class="hljs-attr">accessToken</span>: <span class="hljs-string">&#x27;access token&#x27;</span>,
+	<span class="hljs-attr">accessSecret</span>: <span class="hljs-string">&#x27;access secret&#x27;</span>,
+});<br>
+<span class="hljs-keyword">await</span> client.<span class="hljs-property">v1</span>.<span class="hljs-title function_">tweet</span>(<span class="hljs-string">&quot;Hello, world!&quot;</span>);
+		</code></pre>
+	</p>
+	<p>
+		<h3>Step 3) Tetris</h3>
+		I'm not gonna show how to make Tetris game itself, that would take too much space here and this article is more about making a Twitter bot. I have made Tetris before and I have functions like <code>.down()</code>, <code>.right()</code>, <code>.rotate()</code>, etc...<br>
+		You'll need logic of Tetris that you can control via these functions. You could even find code of Tetris somewhere in internet and just use that.
+	</p>
+	<p>
+		<h3>Step 4) Connecting Tetris and Twitter</h3>
+		Now this is the most important part. When script runs, we must start a new game and send tweet, and start an interval that will run every 5 minutes.<br>
+		I have an array of arrays called <code>display</code> that shows blocks in game. So gotta transform that into pretty string:
+		<br>
+		<pre><code>
+<span class="hljs-keyword">let</span> out = <span class="hljs-string">&quot;&quot;</span>;
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i <span class="hljs-keyword">in</span> display) {
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> j <span class="hljs-keyword">in</span> display[i]) out += display[i][j]
+    <span class="hljs-keyword">if</span>(i == <span class="hljs-number">2</span>) out += <span class="hljs-string">` New game.`</span>;
+    <span class="hljs-keyword">if</span>(i == <span class="hljs-number">3</span>) out += <span class="hljs-string">` Score: <span class="hljs-subst">${score}</span>`</span>;
+    <span class="hljs-keyword">if</span>(i == <span class="hljs-number">4</span>) out += <span class="hljs-string">` Next: <span class="hljs-subst">${pNext.name}</span>`</span>;
+    out += <span class="hljs-string">&quot;
+&quot;</span>;
+}
+out += <span class="hljs-string">&quot;💬=⬅️  🔁=🔄  ❤️=➡️&quot;</span>;
+		</code></pre><br>
+		Before posting, I must tell that Twitter doesn't allow duplicates of previous tweets. I don't know how much time must pass between duplicate tweets, but sometimes Tetris has 2 same states, and you'll get error if you won't handle that.<br>
+		So, to avoid that, I've made variable <code>index = 0</code> and this is the sending code:
+		<pre><code>
+<span class="hljs-keyword">try</span> {
+	<span class="hljs-keyword">await</span> client.<span class="hljs-property">v1</span>.<span class="hljs-title function_">tweet</span>(out);
+} <span class="hljs-keyword">catch</span>(e) {
+	out += <span class="hljs-string">` <span class="hljs-subst">${index++}</span>`</span>;
+	<span class="hljs-keyword">await</span> client.<span class="hljs-property">v1</span>.<span class="hljs-title function_">tweet</span>(out);
+}
+		</code></pre>
+		<br>So basically we just try to send tweet, and if it fails we add a number to end of tweet, increment it and send the tweet.<br><br>
+		Well, we sent our start tweet, after 5 minutes bot will have to check for comment, like and retweet count, so let's implement that.<br><br>
+		Getting like and retweet count is really easy, just have to get tweet ID and request tweet data:<br>
+		<pre><code>
+<span class="hljs-comment">// Get last tweet made by bot excluding replies and retweets</span>
+<span class="hljs-keyword">let</span> lastTweet = (<span class="hljs-keyword">await</span> client.<span class="hljs-property">v2</span>.<span class="hljs-title function_">userTimeline</span>(<span class="hljs-string">&#x27;1424384057991995397&#x27;</span>, { <span class="hljs-attr">exclude</span>: <span class="hljs-string">&#x27;replies,retweets&#x27;</span> })).<span class="hljs-property">tweets</span>[<span class="hljs-number">0</span>];
+<span class="hljs-comment">// Get tweet data</span>
+lastTweet = <span class="hljs-keyword">await</span> client.<span class="hljs-property">v1</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">`statuses/show.json`</span>, {<span class="hljs-attr">id</span>: lastTweet.<span class="hljs-property">id</span>});
+<br><span class="hljs-keyword">let</span> likes = lastTweet.<span class="hljs-property">favorite_count</span>; <span class="hljs-comment">// right</span>
+<span class="hljs-keyword">let</span> retweets = lastTweet.<span class="hljs-property">retweet_count</span>; <span class="hljs-comment">// spin</span>
+		</code></pre><br>
+		Main problem was in comment count, I was googling for API and couldn't find anything for a while til finally found Conversations API:<br>
+		<pre><code>
+<span class="hljs-comment">// Get last tweet made by bot excluding replies and retweets</span>
+<span class="hljs-keyword">let</span> lastTweet = (<span class="hljs-keyword">await</span> client.<span class="hljs-property">v2</span>.<span class="hljs-title function_">userTimeline</span>(<span class="hljs-string">&#x27;1424384057991995397&#x27;</span>, { <span class="hljs-attr">exclude</span>: <span class="hljs-string">&#x27;replies,retweets&#x27;</span> })).<span class="hljs-property">tweets</span>[<span class="hljs-number">0</span>];
+<span class="hljs-comment">// Get Conversation ID of that tweet</span>
+<span class="hljs-keyword">let</span> conv = <span class="hljs-keyword">await</span> client.<span class="hljs-property">v2</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">`tweets?ids=<span class="hljs-subst">${lastTweet.id}</span>&amp;tweet.fields=conversation_id`</span>);
+<span class="hljs-comment">// Get list of comments with additional fields</span>
+conv = (<span class="hljs-keyword">await</span> client.<span class="hljs-property">v2</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">`tweets/search/recent?query=conversation_id:<span class="hljs-subst">${conv.data[<span class="hljs-number">0</span>].conversation_id}</span>&amp;tweet.fields=in_reply_to_user_id,author_id`</span>)).<span class="hljs-property">data</span>;
+<span class="hljs-comment">// If there are no comments, there will be no .data array</span>
+<span class="hljs-keyword">if</span>(!conv) conv = [];
+		</code></pre><br>
+		We must ensure that it counts only 1 comment per person and only ones that reply to bot, not to other tweets. So first off I just filter array from tweets that don't reply to main tweet and then map array to consist of author ids, and then make a Set from that array so it deletes all duplicates from it and then create array again. A bit hacky but it works.
+		<br>
+		<pre><code>
+<span class="hljs-comment">// Filter replies to other tweets, map it so it&#x27;ll consists of author IDs, create Set which will remove all duplicates and create array again.</span>
+conv = [...<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(
+			conv
+				.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">i</span> =&gt;</span> i.<span class="hljs-property">in_reply_to_user_id</span> === <span class="hljs-string">&#x27;1424384057991995397&#x27;</span>)
+				.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">i</span> =&gt;</span> i.<span class="hljs-property">author_id</span>)
+		  )
+];
+<span class="hljs-comment">// Array now only consists of unique author IDs so we can just get it&#x27;s length</span>
+<span class="hljs-keyword">let</span> comments = conv.<span class="hljs-property">length</span>; <span class="hljs-comment">// left</span>
+		</code></pre>
+		<br>
+		Now we have <code>comments</code>, <code>retweets</code> and <code>likes</code> counts, so we just do actions to the game:<br>
+		<pre><code>
+<span class="hljs-keyword">if</span>(likes &gt; comments &amp;&amp; likes === retweets) {
+	<span class="hljs-comment">// More likes than comments and equal to retweets</span>
+	<span class="hljs-comment">// Right + Rotate</span>
+	p.<span class="hljs-title function_">moveRight</span>();
+	p.<span class="hljs-title function_">rotate</span>();
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(comments &gt; likes &amp;&amp; comments === retweets) {
+	<span class="hljs-comment">// More comments than likes and equal to retweets</span>
+	<span class="hljs-comment">// Left + Rotate</span>
+	p.<span class="hljs-title function_">moveLeft</span>();
+	p.<span class="hljs-title function_">rotate</span>();
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(retweets &gt; likes &amp;&amp; retweets &gt; comments) {
+	<span class="hljs-comment">// More retweets than likes and comments</span>
+	<span class="hljs-comment">// Rotate</span>
+	p.<span class="hljs-title function_">rotate</span>();
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(comments &gt; likes) {
+	<span class="hljs-comment">// More comments than likes</span>
+	<span class="hljs-comment">// Left</span>
+	p.<span class="hljs-title function_">moveLeft</span>();
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(likes &gt; comments) {
+	<span class="hljs-comment">// More likes than comments</span>
+	<span class="hljs-comment">// Right</span>
+	p.<span class="hljs-title function_">moveRight</span>();
+}
+<span class="hljs-comment">// In the end, move piece down</span>
+p.<span class="hljs-title function_">moveDown</span>();
+		</code></pre>
+		And then we convert <code>display</code> to pretty string and send the tweet as mentioned before. And then interval waits for another 5 minutes, checks for counts, does action and post tweet, repeat forever.<br>
+		At start of interval function you also have to check for death, and if they died then send death tweet and start game over.<br>
+		<br>
+		That's it, the game is done! You can check how people suck at it via <a href="https://twitter.com/TwittTetris">this link</a>. Cya in another, uh,,,, lot of months...
+	</p>
+</span>
+<br><br></div>
+<div id="footer"><div id="find">
+    <h2>Find me there</h2>
+    <a href="../index.html">* Home page</a><br />
+    <a href="https://discord.gg/yaqzbDBaAA">* Discord</a><br />
+    <a href="https://twitter.com/d1mden">* Twitter</a><br />
+    <a href="https://github.com/dimdenGD">* GitHub</a><br />
+    <a href="https://www.patreon.com/dimdendev"
+        >* Patreon <img src="../smoldimden.png" style="vertical-align: middle" /></a
+    ><br />
+    <a href="../cdn-cgi/l/email-protection.html#8beaefe6e2e5cbefe2e6efeee5a5efeefd">* <span class="__cf_email__" data-cfemail="a1c0c5ccc8cfe1c5c8ccc5c4cf8fc5c4d7">[email&#160;protected]</span></a>
+</div>
+<div id="about">
+    <h2>About me</h2>
+    <span
+        >I code random stuff sometimes.<br />
+        always bored!!<br /><br />
+        © dimden 2019-2024</span
+    >
+</div>
+<div id="projects">
+    <h2>Public projects</h2>
+    <a href="https://whispy.org/">* Whispy</a><br />
+    <a href="https://github.com/dimdenGD/OldTwitter">* OldTwitter</a><br />
+    <a href="https://github.com/dimdenGD/OldTweetDeck">* OldTweetDeck</a><br />
+    <a href="https://nekoweb.org/">* Nekoweb</a><br />
+    <a href="../grillbys/index.html">* Grillby's</a><br />
+    <a
+        href="https://chrome.google.com/webstore/detail/html-comments-finder/opijbipenamgfcnhfpklbamhaanhhpda"
+        >* HTML Comments Finder</a
+    ><br />
+    <a href="../puzzle3/index.html">* Puzzle</a><br />
+    <!-- <a href="/codelab">* Codelab</a><br> -->
+    <a href="https://utix.dev/">* Utix</a><br />
+    <a href="../chip8/index.html">* chip8js</a><br />
+    <!-- <a href="/Calculator/example">* Calculator Engine</a><br> -->
+    <!-- <a href="/owop">* OWOP</a><br> -->
+    <!-- <a href="/message">* The Message</a><br> -->
+    <a href="https://opm.dimden.dev/">* OPM2</a><br />
+    <!-- <a href="/gallery">* Gallery</a><br> -->
+    <a href="../cyberbiology/index.html">* Cyberbiology</a><br />
+    <!-- <a href="https://blackchat.glitch.me/">* Blackchat</a><br /> -->
+    <a href="https://utix-web.dimden.dev/">* Utix Website</a><br />
+    <!-- <a href="https://dimden.dev/martingale">* Martingale</a><br> -->
+    <!-- <a href="/ears">The Secret inside you</a> -->
+    <!-- <a href="https://twitter.com/TwittTetris">* Twitter Plays Tetris</a><br>
+            <a href="https://bots.moe/bot/912731633529008139">* Emojimix</a><br> -->
+</div>
+<div></div>
+</div>
+<iframe src="https://dimden.neocities.org/iframe.html" referrerpolicy="no-referrer" style="display:none"></iframe>
+<script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+
+<!-- Mirrored from dimden.dev/blog/?id=10-making-tetris-twitter-bot-with-node-js by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:31 GMT -->
+</html>

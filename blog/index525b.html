@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from dimden.dev/blog/?id=13-optimizing-rendering-of-100k-html-nodes by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:25 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <meta name="description" content="My website and blog.">
+    <meta name="keywords" content="dimden, JS, JavaScript, Eff the cops, discord, nes, emulators">
+    <meta name="author" content="dimden">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-137155489-1"></script>
+<!-- <script async src="https://arc.io/widget.min.js#PtWkKp1P"></script> -->
+<!-- <script data-ad-client="ca-pub-8494581286071468" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-137155489-1');
+</script>
+
+    <link rel="stylesheet" href="../stylesheet.css">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+    <style>
+        #content {
+            font-family: "MS UI Gothic", Tahoma, sans-serif !important;
+            font-size: 105%;
+        }
+        #date {
+            color: #2e8579;
+            font-family: "MS Gothic", Tahoma, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<!--<h1 id="logo" onclick="window.location.href =`/`;">DIM<letter id="logo-d">D</letter>E<letter id="logo-n">N</letter></h1>-->
+<a href="../index.html">
+    <img id="logo" src="../logo.png">
+</a>
+<script src="../logo.js"></script>
+<hr>
+<!--BLOG-->
+<div id="blog"><title>Optimizing rendering of 100,000+ HTML nodes</title>
+<link rel="stylesheet" href="../highlight/styles/atom-one-dark.css">
+<script src="../../cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../../cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="../../unpkg.com/highlightjs-svelte%401.0.6/dist/svelte.min.js"></script>
+
+<h1>Optimizing rendering of 100,000+ HTML nodes</h1>
+<span id="date">Posted on Thursday, April 4th, 2024</span>
+<br>
+<br>
+<span id="content">
+	<p>
+		TLDR: Optimize rendering by not rendering at all.
+	</p>
+	<p>
+		While working on <a href="https://whispy.org/" target="_blank">Whispy</a>, I've noticed that navigation between pages is quite slow.
+		We use Svelte and SvelteKit as frontend, so on every navigation, the page recreated from scratch and it has to rerender all nodes (elements) again.
+	</p>
+	<p>
+		Initially, I didn't know what exactly was causing the slowness, so I started looking around in DevTools.
+		In Performance monitor tab it became clear what's the issue:
+	</p>
+	<p>
+		<img src="../../lune.dimden.dev/a603d8e3fee7.png" alt="DOM Nodes: 121,081">
+	</p>
+	<p>
+		Because every post component is quite complex and has a lot of stuff, with just 500 posts rendered it already amounts to 100,000+ nodes (about 200 nodes per post, keep in mind that 'node' is different from 'element' - node can be text node, comment node, etc.).
+	</p>
+	<p>
+		While thinking on how to solve it, I got a simple idea: why not just render the posts that are visible on the screen and render the rest as empty divs with rendered height? You might be wondering what's the point of preserving the height of the post if it's not rendered: it's important to do it so the scroll restoration works correctly and you end up at the same position where you was before navigating to another page.
+		And then as you scroll close to unrendered posts you replace empty divs with actual content.
+		This way we can reduce the number of nodes rendered at once and unblock the main thread quickly.
+	</p>
+	<p>
+		Biggest problem is that every post has different height, so it's not possible to just set fixed height for every element like virtual list libraries do.
+		So instead I've decided to first always render posts when they appear for the first time, and then save their height into an object using ResizeObserver.
+	</p>
+	<p>
+		Following code is written with SvelteKit, but it the idea can be easily ported to any other framework or vanilla JavaScript.
+	</p>
+	<p>
+		This is the component I ended up with:
+	</p>
+	<pre>
+		<code class="svelte">
+&lt;script&gt;
+	import { navigating } from '$app/stores';
+	import { tick, onDestroy } from 'svelte';
+	import { onResize, onVisibility } from '$lib/actions'; // explanation below
+	import { postHeights } from '$lib/stores'; // export const postHeights = {};
+	import { browser } from '$app/environment';
+
+	export let id = null; // post id
+
+	let visible = false;
+	let el;
+
+	function resized(entry) {
+		// save the height of the post
+		postHeights[id] = entry.contentRect.height;
+	}
+
+	function onvisible() {
+		// this fires when post is within 1500 pixels of the viewport
+		if (!visible) {
+			visible = true;
+		}
+	}
+
+	if (id && browser) {
+		onDestroy(() => {
+			// resize observer doesnt always fire, so we need to save the height when the component is destroyed
+			if (!postHeights[id] && el) {
+				postHeights[id] = el.getBoundingClientRect().height;
+			}
+		});
+	}
+
+	// on navigation
+	$: if (!$navigating) {
+		// if no height stored then its rendering for the first time and should be always visible
+		if (!postHeights[id]) {
+			visible = true;
+		} else {
+			// wait for slot to render
+			tick().then(() => {
+				if (!el) return (visible = true);
+				// check if post is within 3000 pixels of the viewport and set visible to true
+				let rect = el.getBoundingClientRect();
+				if (rect.top < window.innerHeight + 3000 && rect.bottom > -3000) {
+					visible = true;
+				}
+			});
+		}
+	}
+&lt;/script&gt;
+
+&lt;div
+	class="container"
+	bind:this={el}
+	use:onResize={resized}
+	use:onVisibility={onvisible}
+	style:height={!visible && postHeights[id] ? postHeights[id] + 'px' : null}
+&gt;
+	{#if visible || !id}
+		&lt;!-- only render content when 'visible' is set to true --&gt;
+		&lt;slot /&gt;
+	{/if}
+&lt;/div&gt;
+		</code>
+	</pre>
+
+	<p>
+		You can see <code>onResize</code> and <code>onVisibility</code> used in the component. These are <a href="https://svelte.dev/docs/svelte-action" target="_blank">Svelte actions</a> that I've created to handle ResizeObserver and IntersectionObserver. To not create a new observers for every post, There's a single ResizeObserver and IntersectionObserver that are used for all posts. Implementation of these actions looks like this:
+	</p>
+	<pre>
+		<code class="language-javascript">
+import { browser } from '$app/environment';
+
+// visibility //
+function isNearViewport(entry, pixels) {
+	const { top, bottom } = entry.boundingClientRect;
+	// within pixels of the viewport
+	return (
+		(top >= -pixels && top <= window.innerHeight + pixels) ||
+		(bottom >= -pixels && bottom <= window.innerHeight + pixels)
+	);
+}
+
+// weakmaps are cool because you can use elements as keys and map them into their callbacks
+const observeCallbacks = new WeakMap();
+const intersectionObserver =
+	browser &&
+	new IntersectionObserver((entries) => {
+		entries.forEach((entry) => {
+			// if the element is in the viewport or near it
+			if (entry.isIntersecting || isNearViewport(entry, 1500)) {
+				const cb = observeCallbacks.get(entry.target);
+				if (cb) {
+					cb();
+					intersectionObserver.unobserve(entry.target);
+				}
+			}
+		});
+	});
+
+export function onVisibility(node, cb) {
+	observeCallbacks.set(node, cb);
+	intersectionObserver.observe(node);
+
+	return {
+		destroy() {
+			if (observeCallbacks.has(node)) {
+				observeCallbacks.delete(node);
+				intersectionObserver.unobserve(node);
+			}
+		},
+	};
+}
+
+// size //
+const resizeCallbacks = new WeakMap();
+const resizeObserver =
+	browser &&
+	new ResizeObserver((entries) => {
+		entries.forEach((entry) => {
+			const cb = resizeCallbacks.get(entry.target);
+			if (cb) {
+				cb(entry);
+			}
+		});
+	});
+export function onResize(node, cb) {
+	resizeCallbacks.set(node, cb);
+	resizeObserver.observe(node);
+
+	return {
+		destroy() {
+			if (resizeCallbacks.has(node)) {
+				resizeCallbacks.delete(node);
+				resizeObserver.unobserve(node);
+			}
+		},
+	};
+}
+		</code>
+	</pre>
+
+	<p>
+		Now with this optimization you can see how much faster the page loads:
+	</p>
+	<p>
+		<video src="https://lune.dimden.dev/a8695869da24.mp4" controls style="max-width:100%"></video>
+	</p>
+	<p>
+		That's it! Very simple optimization yet it makes a huge difference in performance. While user scrolls, it only needs to render a bunch of posts and not 500 posts all at once. Easiest way to optimize rendering is to not render at all.
+	</p>
+</span>
+
+<script>
+hljs.highlightAll();
+</script>
+<br><br>
+<style>
+	#content {
+		max-width: 1200px;
+		display: block;
+	}
+	#content a {
+		color: #2f8f8a;
+	}
+	code.hljs {
+		background-color: black !important;
+	}
+	pre {tab-size: 4}
+</style></div>
+<div id="footer"><div id="find">
+    <h2>Find me there</h2>
+    <a href="../index.html">* Home page</a><br />
+    <a href="https://discord.gg/yaqzbDBaAA">* Discord</a><br />
+    <a href="https://twitter.com/d1mden">* Twitter</a><br />
+    <a href="https://github.com/dimdenGD">* GitHub</a><br />
+    <a href="https://www.patreon.com/dimdendev"
+        >* Patreon <img src="../smoldimden.png" style="vertical-align: middle" /></a
+    ><br />
+    <a href="../cdn-cgi/l/email-protection.html#5f3e3b3236311f3b36323b3a31713b3a29">* <span class="__cf_email__" data-cfemail="d5b4b1b8bcbb95b1bcb8b1b0bbfbb1b0a3">[email&#160;protected]</span></a>
+</div>
+<div id="about">
+    <h2>About me</h2>
+    <span
+        >I code random stuff sometimes.<br />
+        always bored!!<br /><br />
+        © dimden 2019-2024</span
+    >
+</div>
+<div id="projects">
+    <h2>Public projects</h2>
+    <a href="https://whispy.org/">* Whispy</a><br />
+    <a href="https://github.com/dimdenGD/OldTwitter">* OldTwitter</a><br />
+    <a href="https://github.com/dimdenGD/OldTweetDeck">* OldTweetDeck</a><br />
+    <a href="https://nekoweb.org/">* Nekoweb</a><br />
+    <a href="../grillbys/index.html">* Grillby's</a><br />
+    <a
+        href="https://chrome.google.com/webstore/detail/html-comments-finder/opijbipenamgfcnhfpklbamhaanhhpda"
+        >* HTML Comments Finder</a
+    ><br />
+    <a href="../puzzle3/index.html">* Puzzle</a><br />
+    <!-- <a href="/codelab">* Codelab</a><br> -->
+    <a href="https://utix.dev/">* Utix</a><br />
+    <a href="../chip8/index.html">* chip8js</a><br />
+    <!-- <a href="/Calculator/example">* Calculator Engine</a><br> -->
+    <!-- <a href="/owop">* OWOP</a><br> -->
+    <!-- <a href="/message">* The Message</a><br> -->
+    <a href="https://opm.dimden.dev/">* OPM2</a><br />
+    <!-- <a href="/gallery">* Gallery</a><br> -->
+    <a href="../cyberbiology/index.html">* Cyberbiology</a><br />
+    <!-- <a href="https://blackchat.glitch.me/">* Blackchat</a><br /> -->
+    <a href="https://utix-web.dimden.dev/">* Utix Website</a><br />
+    <!-- <a href="https://dimden.dev/martingale">* Martingale</a><br> -->
+    <!-- <a href="/ears">The Secret inside you</a> -->
+    <!-- <a href="https://twitter.com/TwittTetris">* Twitter Plays Tetris</a><br>
+            <a href="https://bots.moe/bot/912731633529008139">* Emojimix</a><br> -->
+</div>
+<div></div>
+</div>
+<iframe src="https://dimden.neocities.org/iframe.html" referrerpolicy="no-referrer" style="display:none"></iframe>
+<script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+
+<!-- Mirrored from dimden.dev/blog/?id=13-optimizing-rendering-of-100k-html-nodes by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:30 GMT -->
+</html>

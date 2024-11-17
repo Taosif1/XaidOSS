@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from dimden.dev/blog/?id=6-brainfuck-js by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:32 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <meta name="description" content="My website and blog.">
+    <meta name="keywords" content="dimden, JS, JavaScript, Eff the cops, discord, nes, emulators">
+    <meta name="author" content="dimden">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-137155489-1"></script>
+<!-- <script async src="https://arc.io/widget.min.js#PtWkKp1P"></script> -->
+<!-- <script data-ad-client="ca-pub-8494581286071468" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-137155489-1');
+</script>
+
+    <link rel="stylesheet" href="../stylesheet.css">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+    <style>
+        #content {
+            font-family: "MS UI Gothic", Tahoma, sans-serif !important;
+            font-size: 105%;
+        }
+        #date {
+            color: #2e8579;
+            font-family: "MS Gothic", Tahoma, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<!--<h1 id="logo" onclick="window.location.href =`/`;">DIM<letter id="logo-d">D</letter>E<letter id="logo-n">N</letter></h1>-->
+<a href="../index.html">
+    <img id="logo" src="../logo.png">
+</a>
+<script src="../logo.js"></script>
+<hr>
+<!--BLOG-->
+<div id="blog"><title>brainfuck.js - DIMDEN</title>
+<link rel="stylesheet" href="../highlight/styles/atom-one-dark.css">
+<script src="../highlight/highlight.pack.js"></script>
+<script src="../../cdnjs.cloudflare.com/ajax/libs/markdown-it/10.0.0/markdown-it.min.js"></script>
+<!-- <script>hljs.initHighlightingOnLoad();</script> -->
+<h1>brainfuck.js</h1>
+<span id="date">Posted on Sunday, 12th of January 2020</span>
+<br>
+<br>
+<span id="content">
+  <p>Hi, it's been so long since last post, but i'm still alive. Few days ago I was very bored so I decided to make my own brainfuck interpreter.</p>
+  <p>Today I'll show you my way of making it. Firstly I made my interpreter and only after that I started looking at other people code, and tbh I think it's all outdated or just bad code. I love modern JavaScript and I will use it.</p>
+  <p>So let's start from making a class and constructor:</p>
+  <pre><code class="language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Brainfuck</span> </span>{
+      <span class="hljs-keyword">constructor</span>(program, input = "", size = 30000) { <span class="hljs-comment">// default input will be empty string, and size of memory will be 30000 just like in original brainfuck</span>
+          <span class="hljs-keyword">if</span>(!program) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"No program to interpret."</span>);
+          <span class="hljs-keyword">this</span>.program = program;
+          <span class="hljs-keyword">this</span>.input = input;
+          <span class="hljs-keyword">this</span>.size = size;
+          <span class="hljs-keyword">this</span>.array = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(size).fill(<span class="hljs-number">0</span>); <span class="hljs-comment">// our memory filled with zero's</span>
+          <span class="hljs-keyword">this</span>.p = <span class="hljs-number">0</span>; <span class="hljs-comment">// pointer</span>
+          <span class="hljs-keyword">this</span>.i = <span class="hljs-number">0</span>; <span class="hljs-comment">// index</span>
+          <span class="hljs-keyword">this</span>.done = <span class="hljs-literal">false</span>; <span class="hljs-comment">// when program will be completed, set this to true</span>
+      };
+  };
+  </code></pre>
+  <p>I want to make my own EventEmitter for sending our data to event listeners. I only will make <code>on</code> and <code>emit</code>, because I don't need huge EventEmitter with <code>once</code> and <code>off</code>.
+  So, let's make new variable in constructor:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">this</span>.events = {};
+  </code></pre>
+  <p>And now <code>on</code> and <code>emit</code> methods. They are super simple:</p>
+  <pre><code class="language-js">on(name, fn) {
+      <span class="hljs-keyword">if</span>(!<span class="hljs-keyword">this</span>.events[name]) <span class="hljs-keyword">this</span>.events[name] = [];
+      <span class="hljs-keyword">this</span>.events[name].push(fn);
+  };
+emit(name, ...args) {
+  <span class="hljs-keyword">if</span>(!<span class="hljs-keyword">this</span>.events[name]) <span class="hljs-keyword">return</span>;
+  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i <span class="hljs-keyword">in</span> <span class="hljs-keyword">this</span>.events[name]) <span class="hljs-keyword">this</span>.events[name][i](...args);
+};
+  </code></pre>
+  <p>And now we can do this:</p>
+  <pre><code class="language-js">bf.on(<span class="hljs-string">"test"</span>, <span class="hljs-built_in">console</span>.log);
+bf.emit(<span class="hljs-string">"test"</span>, <span class="hljs-string">"Hello, world!"</span>);
+  </code></pre>
+  <p>And we will get &quot;Hello, world!&quot; in console.</p>
+  <p>Now let's make our <code>step</code> method! It'll be our main method that will be called on every instruction. You'll see why i'm not doing just a normal loop later.</p>
+  <pre><code class="language-js">step() {
+  <span class="hljs-keyword">let</span> program = <span class="hljs-keyword">this</span>.program; <span class="hljs-comment">// to make code shorter</span>
+  <span class="hljs-keyword">let</span> invalid = <span class="hljs-literal">false</span>; <span class="hljs-comment">// if invalid character in code is using then we set this to true</span>
+  <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.done || program[<span class="hljs-keyword">this</span>.i] === <span class="hljs-literal">undefined</span>) { <span class="hljs-comment">// if this.done is set to true manually or program have ended then we send event to "done"</span>
+      <span class="hljs-keyword">this</span>.done = <span class="hljs-literal">true</span>;
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">"done"</span>);
+  };
+  <span class="hljs-keyword">switch</span>(program[<span class="hljs-keyword">this</span>.i]) { <span class="hljs-comment">// we will implement instructions here later</span>
+  
+  };
+  <span class="hljs-keyword">if</span>(!invalid) <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">"tick"</span>); <span class="hljs-comment">// let's call this event just in case if some program will need to get every real tick of program.</span>
+  <span class="hljs-keyword">this</span>.i++;
+};
+  </code></pre>
+  <p>Now our skeleton of <code>step</code> is done, let's work on instructions of brainfuck.
+  First instruction is <code>&gt;</code>. It moves pointer to the right. If you'll imagine huge array, like this:</p>
+  <pre><code style="font-size: 18px">[0,0,0,0,0,0,0,0,0,0,0...]
+ <span id="pointer">^</span>
+<span id="pointer-var">this.p = 0;</span>
+  </code></pre>
+  <script>
+    let pon = 0;
+    setInterval(() => {
+      pon = !pon;
+      if(pon) {
+        document.getElementById("pointer").innerText = "  ^";
+        document.getElementById("pointer-var").innerText = "this.p = 1;";
+      } else {
+        document.getElementById("pointer").innerText = "^";
+        document.getElementById("pointer-var").innerText = "this.p = 0;";
+      }
+    }, 700);
+  </script>
+  <p>then <code>^</code> is our pointer, and it'll be moved to second zero. So let's add it to our <code>switch</code>:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"&gt;"</span>:
+      <span class="hljs-keyword">this</span>.p++;
+      <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>And same thing with <code>&lt;</code>:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"&lt;"</span>:
+      <span class="hljs-keyword">this</span>.p--;
+      <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>Seems pretty simple at first, but we missed something very important. I don't really know should it behave like this, but a lot of programs that I see in codegolf did this at the start of brainfuck program:</p>
+  <pre><code class="language-brainfuck">&lt;
+  </code></pre>
+  <p>What's so special about this? Our pointer is now <code>-1</code>, and if it'll try to call our memory, it'll just return <code>undefined</code> or if we will try to use <code>+</code> or <code>-</code> instructions will just make <code>NaN</code>. But we don't need that! Let's make something like overflow, so when we move it to left it'll actually will be <code>30000</code> or other size that we put in <code>size</code> argument instead of <code>-1</code>. Let's make function for this:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">this</span>.mod = <span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> {
+  b += <span class="hljs-number">1</span>;
+  <span class="hljs-keyword">return</span> ((a % b) + b) % b;
+}
+  </code></pre>
+  <p>And now let's remake our <code>&lt;</code> and <code>&gt;</code> a bit:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"&gt;"</span>: <span class="hljs-keyword">this</span>.p++; <span class="hljs-keyword">this</span>.p = <span class="hljs-keyword">this</span>.mod(<span class="hljs-keyword">this</span>.p, <span class="hljs-keyword">this</span>.size); <span class="hljs-keyword">break</span>;
+<span class="hljs-keyword">case</span> <span class="hljs-string">"&lt;"</span>: <span class="hljs-keyword">this</span>.p--; <span class="hljs-keyword">this</span>.p = <span class="hljs-keyword">this</span>.mod(<span class="hljs-keyword">this</span>.p, <span class="hljs-keyword">this</span>.size); <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>Now everything should be fine when programs will do this kind of stuff.</p>
+  <p>Next instructions are <code>+</code> and <code>-</code>. They increment or decrement current value.
+  But we know that brainfuck uses 8 bit numbers so let's not make same mistake and make overflow here too:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"+"</span>: <span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p] = (<span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p]+<span class="hljs-number">1</span>) &amp; <span class="hljs-number">255</span>; <span class="hljs-keyword">break</span>;
+<span class="hljs-keyword">case</span> <span class="hljs-string">"-"</span>: <span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p] = (<span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p]<span class="hljs-number">-1</span>) &amp; <span class="hljs-number">255</span>; <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>Now if number will be <code>256</code> it'll be transformed to <code>0</code>.</p>
+  <p>Now we're getting to harder instructions. <code>.</code> instruction will output character to &quot;out&quot; event, we have to make character instead of number, luckily we have <code>String.fromCharCode</code>, so let's do it:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"."</span>: <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">"out"</span>, <span class="hljs-built_in">String</span>.fromCharCode(<span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p])); <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p><code>,</code> instruction reads input and puts ASCII code into memory. Let's make current character variable so we can know what character we should give:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">this</span>.char = <span class="hljs-number">0</span>;
+  </code></pre>
+  <p>And now let's implement <code>,</code>:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">","</span>:
+      <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">"in"</span>); <span class="hljs-comment">// let's send event when program requires input</span>
+      <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.input[<span class="hljs-keyword">this</span>.char] === <span class="hljs-literal">undefined</span>) {
+        <span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p] = <span class="hljs-number">0</span>; <span class="hljs-comment">// if no more stuff in input left, let's just put zero</span>
+        <span class="hljs-keyword">break</span>;
+      };
+      <span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p] = <span class="hljs-keyword">this</span>.input[<span class="hljs-keyword">this</span>.char++].charCodeAt(<span class="hljs-number">0</span>);
+      <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>I should mention about my dumb mistake: I was using <code>charAt</code> instead of <code>charCodeAt</code> and because of that my interpreter was working in weird way, and it took me 2 hours to find a mistake lol.</p>
+  <p>Now 2 hardest instructions: <code>[</code> and <code>]</code>. People usually call them loop. But for some reason they forget to mention their full description of what do they do:</p>
+  <ul>
+  <li><code>[</code> - if the byte at the data pointer is zero, then instead of moving the instruction pointer forward to the next command, jump it forward to the command after the matching <code>]</code> command.</li>
+  <li><code>]</code> - if the byte at the data pointer is nonzero, then instead of moving the instruction pointer forward to the next command, jump it back to the command after the matching <code>[</code> command.</li>
+  </ul>
+  <p>Usually people just say <code>[</code> - start of loop, <code>]</code> - if <code>program[p] === 0</code> then end loop without mentioning important stuff. And because of that I was struggling with it for some time :pensive:</p>
+  <p>There's a lot of ways implementing loops, but here's mine: since there is also can be nested loops, we should find address of <code>]</code> that is pair of <code>[</code>. So let's make variable called <code>ignore</code> and set <code>0</code>. Then just loop though code, and when we find <code>[</code> add increment <code>ignore</code> and when we find <code>]</code> then decrement it. And if <code>ignore</code> was <code>0</code> at the moment of finding <code>]</code> then it's our pair! And we can now do stuff with it knowing it's address.</p>
+  
+  <pre><code style="font-size: 18px">+<span id="colon-1">[</span>->>+<span id="colon-2">[</span>-<span id="colon-3">]</span>+<span id="colon-4">[</span>-++<span id="colon-5">[</span>-<span id="colon-6">]</span><span id="colon-7">]</span>+>+<span id="colon-8">]</span>
+<span id="pointer-2">^</span>
+<span id="done" style="color: greenyellow" hidden>FOUND</span>
+this.i = <span id="index">0</span>;
+temp_i = <span id="temp_i">null</span>;
+ignore = <span id="ignore">null</span>;
+  </code></pre>
+  <button style="background-color: black; color: white; border: solid 1px gray; font-family: monospace; padding: 2px; cursor: pointer" onclick="ind=0">Start animation from beginning</button>
+  <script>
+    let ind = 0;
+    let index = 0;
+    let tempi = null;
+    let ignore = null;
+    let col = i => document.getElementById(`colon-${i}`);
+    let wait = ms => new Promise(r => setTimeout(r, ms));
+    setInterval(async () => {
+      if(ind > 21) return;
+      document.getElementById("pointer-2").innerText = new Array(ind).fill(" ").join("") + "^";
+      tempi = ind;
+      switch(ind) {
+        case 0:
+          document.getElementById("done").hidden = true;
+          ignore = "null";
+          tempi = "null";
+          col(1).style.color = "";
+          col(2).style.color = "";
+          col(3).style.color = "";
+          col(4).style.color = "";
+          col(5).style.color = "";
+          col(6).style.color = "";
+          col(7).style.color = "";
+          col(8).style.color = "";
+          index = 0;
+          document.getElementById("pointer-2").style.color = "lightgray";
+          document.getElementById("ignore").style.color = "";
+          break;
+        case 1:
+          index = 1;
+          col(1).style.color = "yellow";
+          document.getElementById("pointer-2").style.color = "rgba(255, 255, 255, 0.3)";
+          document.getElementById("ignore").style.color = "green";
+          ignore = 0;
+          break;
+        case 6:
+          col(1).style.color = "red";
+          col(2).style.color = "red";
+          ignore++;
+          document.getElementById("ignore").style.color = "red";
+          break;
+        case 7:
+          col(1).style.color = "yellow";
+          col(2).style.color = ""; 
+          break;
+        case 8:
+          col(1).style.color = "red";
+          col(2).style.color = "green";
+          col(3).style.color = "green";
+          document.getElementById("ignore").style.color = "green";
+          ignore--;
+          break;
+        case 9:
+          col(1).style.color = "yellow";
+          col(2).style.color = "";
+          col(3).style.color = "";
+          break;
+        case 10:
+          col(1).style.color = "red";
+          col(4).style.color = "red";
+          ignore++;
+          document.getElementById("ignore").style.color = "red";
+          break;
+        case 11:
+          col(1).style.color = "yellow";
+          col(4).style.color = "";
+          break;
+        case 14:
+          col(1).style.color = "red";
+          col(5).style.color = "red";
+          ignore++;
+          break;
+        case 15:
+          col(1).style.color = "yellow";
+          col(5).style.color = "";
+          break;
+        case 16:
+          col(1).style.color = "red";
+          col(5).style.color = "green";
+          col(6).style.color = "green";
+          ignore--;
+          break;
+        case 17:
+          col(5).style.color = "";
+          col(6).style.color = "";
+          col(1).style.color = "red";
+          col(4).style.color = "green";
+          col(7).style.color = "green";
+          ignore--;
+          document.getElementById("ignore").style.color = "green";
+          break;
+        case 18:
+          col(1).style.color = "yellow";
+          col(4).style.color = "";
+          col(7).style.color = "";
+          break;
+        case 21:
+          col(1).style.color = "green";
+          col(8).style.color = "green";
+          document.getElementById("done").hidden = false;
+          
+          break;
+      };
+      document.getElementById("ignore").innerText = ignore;
+      document.getElementById("index").innerText = index;
+      document.getElementById("temp_i").innerText = tempi;
+      ind++;
+      if(ind > 21) {
+        await wait(3000);
+        ind = 0;
+      }
+    }, 1000);
+
+  </script>
+
+  <p>We have to save address of it somewhere, so let's make object for that:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">this</span>.loops = {};
+  </code></pre>
+  <p>Since we know address of paired <code>]</code> we can implement our instruction. If <code>program[p] === 0</code> then jump to <code>]</code> and continue executing, else just continue executing here but add it to <code>this.loops</code> so we can know where to jump at <code>]</code>.</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"["</span>:
+    <span class="hljs-keyword">let</span> temp_i = <span class="hljs-keyword">this</span>.i;
+    <span class="hljs-keyword">let</span> ignore = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>) {
+      temp_i++;
+      <span class="hljs-keyword">if</span>(!program[temp_i]) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Out of bounds."</span>);
+      <span class="hljs-keyword">if</span>(program[temp_i] === <span class="hljs-string">"["</span>) ignore++;
+      <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.program[temp_i] === <span class="hljs-string">"]"</span>) {
+        <span class="hljs-keyword">if</span>(ignore === <span class="hljs-number">0</span>) {
+            <span class="hljs-comment">// pair found!</span>
+            <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p] === <span class="hljs-number">0</span>) <span class="hljs-keyword">this</span>.i = temp_i; <span class="hljs-comment">// jump to ']' if 0</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">this</span>.loops[temp_i] = <span class="hljs-keyword">this</span>.i; <span class="hljs-comment">// just continue</span>
+            <span class="hljs-keyword">break</span>; <span class="hljs-comment">// exit loop</span>
+        } <span class="hljs-keyword">else</span> ignore--;
+      }
+    }
+    <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>And now <code>]</code> instruction. It's simpler because we don't need to find our pair back: we already saved it in <code>this.loops</code>. So if <code>program[p] !== 0</code> then just jump back to paired <code>[</code>, else remove our loop from list and continue executing.</p>
+  <pre><code class="language-js"><span class="hljs-keyword">case</span> <span class="hljs-string">"]"</span>:
+        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.array[<span class="hljs-keyword">this</span>.p] !== <span class="hljs-number">0</span>) <span class="hljs-keyword">this</span>.i = <span class="hljs-keyword">this</span>.loops[<span class="hljs-keyword">this</span>.i];
+        <span class="hljs-keyword">else delete</span> <span class="hljs-keyword">this</span>.loops[<span class="hljs-keyword">this</span>.i];
+        <span class="hljs-keyword">break</span>;
+  </code></pre>
+  <p>All done! Now the only thing we have to do is just to set <code>invalid</code> to true if it's comment, not instruction:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">default</span>: invalid = <span class="hljs-literal">true</span>;
+  </code></pre>
+  <p>Now we just should make <code>init</code> method. So why did I make <code>step</code> method instead of loop? First off because sometimes you want to <strong>debug</strong> program, so you can make your own debugger just with <code>step</code>ping. And second off, sometimes programs are very big and laggy, and running loop will freeze page, so I want to use <code>requestAnimationFrame</code>. So let's do it:</p>
+  <pre><code class="language-js">init(speed = <span class="hljs-number">1000</span>) {
+    <span class="hljs-keyword">const</span> fn = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; speed; i++) <span class="hljs-keyword">this</span>.step();
+      <span class="hljs-keyword">if</span>(!<span class="hljs-keyword">this</span>.done) requestAnimationFrame(fn);
+    };
+    fn();
+}
+  </code></pre>
+  <p>And with this function we can set our speed of execution (default is 1000).</p>
+  <p>And now our interpreter is done! You can get full code on my <a href="../../github.com/dimdenGD/brainfuck.html">GitHub</a>.
+  To run brainfuck code just do this:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">const</span> program = <span class="hljs-string">"--[&gt;---&gt;-&gt;-&gt;++&gt;-&lt;&lt;&lt;&lt;&lt;-------]&gt;--.&gt;---------.&gt;--..+++.&gt;----.&gt;+++++++++.&lt;&lt;.+++.------.&lt;-.&gt;&gt;+."</span>;
+<span class="hljs-keyword">const</span> bf = <span class="hljs-keyword">new</span> Brainfuck(program);
+
+bf.on(<span class="hljs-string">"out"</span>, o =&gt; <span class="hljs-built_in">console</span>.log(o));
+bf.init();
+  </code></pre>
+  <p>or little bit smarter way:</p>
+  <pre><code class="language-js"><span class="hljs-keyword">const</span> program = <span class="hljs-string">"--[&gt;---&gt;-&gt;-&gt;++&gt;-&lt;&lt;&lt;&lt;&lt;-------]&gt;--.&gt;---------.&gt;--..+++.&gt;----.&gt;+++++++++.&lt;&lt;.+++.------.&lt;-.&gt;&gt;+."</span>;
+<span class="hljs-keyword">const</span> bf = <span class="hljs-keyword">new</span> Brainfuck(program);
+<span class="hljs-keyword">let</span> out = <span class="hljs-string">""</span>;
+
+bf.on(<span class="hljs-string">"out"</span>, o =&gt; out += o);
+bf.on(<span class="hljs-string">"done"</span>, () =&gt; <span class="hljs-built_in">console</span>.log(out));
+bf.init();
+  </code></pre>
+  <p>Join my Discord server if you're interested in other stuff like this: <a href="https://discord.gg/k4u7ddk">dimden.dev/invite</a>.</p>
+  
+</span>
+<br><br>
+</div>
+<div id="footer"><div id="find">
+    <h2>Find me there</h2>
+    <a href="../index.html">* Home page</a><br />
+    <a href="https://discord.gg/yaqzbDBaAA">* Discord</a><br />
+    <a href="https://twitter.com/d1mden">* Twitter</a><br />
+    <a href="https://github.com/dimdenGD">* GitHub</a><br />
+    <a href="https://www.patreon.com/dimdendev"
+        >* Patreon <img src="../smoldimden.png" style="vertical-align: middle" /></a
+    ><br />
+    <a href="../cdn-cgi/l/email-protection.html#e8898c858186a88c81858c8d86c68c8d9e">* <span class="__cf_email__" data-cfemail="7716131a1e1937131e1a13121959131201">[email&#160;protected]</span></a>
+</div>
+<div id="about">
+    <h2>About me</h2>
+    <span
+        >I code random stuff sometimes.<br />
+        always bored!!<br /><br />
+        © dimden 2019-2024</span
+    >
+</div>
+<div id="projects">
+    <h2>Public projects</h2>
+    <a href="https://whispy.org/">* Whispy</a><br />
+    <a href="https://github.com/dimdenGD/OldTwitter">* OldTwitter</a><br />
+    <a href="https://github.com/dimdenGD/OldTweetDeck">* OldTweetDeck</a><br />
+    <a href="https://nekoweb.org/">* Nekoweb</a><br />
+    <a href="../grillbys/index.html">* Grillby's</a><br />
+    <a
+        href="https://chrome.google.com/webstore/detail/html-comments-finder/opijbipenamgfcnhfpklbamhaanhhpda"
+        >* HTML Comments Finder</a
+    ><br />
+    <a href="../puzzle3/index.html">* Puzzle</a><br />
+    <!-- <a href="/codelab">* Codelab</a><br> -->
+    <a href="https://utix.dev/">* Utix</a><br />
+    <a href="../chip8/index.html">* chip8js</a><br />
+    <!-- <a href="/Calculator/example">* Calculator Engine</a><br> -->
+    <!-- <a href="/owop">* OWOP</a><br> -->
+    <!-- <a href="/message">* The Message</a><br> -->
+    <a href="https://opm.dimden.dev/">* OPM2</a><br />
+    <!-- <a href="/gallery">* Gallery</a><br> -->
+    <a href="../cyberbiology/index.html">* Cyberbiology</a><br />
+    <!-- <a href="https://blackchat.glitch.me/">* Blackchat</a><br /> -->
+    <a href="https://utix-web.dimden.dev/">* Utix Website</a><br />
+    <!-- <a href="https://dimden.dev/martingale">* Martingale</a><br> -->
+    <!-- <a href="/ears">The Secret inside you</a> -->
+    <!-- <a href="https://twitter.com/TwittTetris">* Twitter Plays Tetris</a><br>
+            <a href="https://bots.moe/bot/912731633529008139">* Emojimix</a><br> -->
+</div>
+<div></div>
+</div>
+<iframe src="https://dimden.neocities.org/iframe.html" referrerpolicy="no-referrer" style="display:none"></iframe>
+<script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+
+<!-- Mirrored from dimden.dev/blog/?id=6-brainfuck-js by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:35 GMT -->
+</html>

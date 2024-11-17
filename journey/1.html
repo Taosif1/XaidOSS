@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dimden.dev/journey/1 by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:48 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journey</title>
+    <style>
+        body {
+            background-color: transparent;
+            color: red;
+            margin: 0;
+            overflow: hidden;
+            font-family: MS UI Gothic;
+        }
+        a {
+            color: red;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #entrances {
+            width: fit-content;
+        }
+        #links, #header {
+            text-align: center;
+        }
+        #header img {
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+        #update input, #update button {
+            border: 1px solid red;
+            font-family: MS Gothic;
+            color: red;
+            padding: 2px;
+            background-color: transparent;
+        }
+        #update button:hover {
+            background-color: rgba(255, 0, 0, 0.164);
+        }
+        #update {
+            text-align: center;
+            opacity: 0.3;
+        }
+        #update:hover, #update:focus, #update:active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="entrances">
+        <div id="header">
+            <img src="https://dimden.dev/images/paschal_candle.png" alt="paschal candle" width="32" title="Keep the flame burning">
+            <b>my journey</b>
+            <img src="https://dimden.dev/images/paschal_candle.png"alt="paschal candle" width="32" title="Keep the flame burning">
+            <br><br>
+        </div>
+        
+            <b>11.05.2023</b> - nothing happened today<br>
+        
+            <b>11.11.2022</b> - kherson<br>
+        
+            <b>10.11.2022</b> - nothing happened today<br>
+        
+            <b>09.11.2022</b> - nothing happened today<br>
+        
+            <b>08.11.2022</b> - nothing happened today<br>
+        
+            <b>07.11.2022</b> - nothing happened today<br>
+        
+            <b>06.11.2022</b> - nothing happened today<br>
+        
+            <b>05.11.2022</b> - nothing happened today<br>
+        
+            <b>04.11.2022</b> - nothing happened today<br>
+        
+            <b>03.11.2022</b> - nothing happened today<br>
+        
+        <br>
+        <div id="links">
+            
+            <b>
+                (1/16)
+            </b>
+            
+                <b><a href="https://dimden.dev/journey/2">></a></b>
+            
+        </div>
+        <br>
+        <div id="update">
+            <!-- <input id="date" placeholder="date" style="width:30px">  -->
+            <input id="text" placeholder="nothing happened today"> 
+            <input id="pass" placeholder="pass" style="width:30px"> 
+            <button id="update-button">update</button>
+        </div>
+        <script>
+            let update_button = document.getElementById('update-button');
+            let text = document.getElementById('text');
+            let pass = document.getElementById('pass');
+            update_button.onclick = function() {
+                fetch('/journey/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text.value,
+                        pass: pass.value
+                    })
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(data) {
+                    if(data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+
+<!-- Mirrored from dimden.dev/journey/1 by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:48 GMT -->
+</html>

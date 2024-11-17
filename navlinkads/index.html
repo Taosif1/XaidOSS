@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<!-- Mirrored from dimden.dev/navlinkads/ by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:48 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="darkreader-lock">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>NavLink Ads!</title>
+        <link rel="stylesheet" href="https://dimden.dev/css/main.css" />
+        <meta name="description" content="Get a nice ad widget for your personal site." />
+        <meta
+            name="keywords"
+            content="dimden, JS, JavaScript, discord, nes, emulators, 90s, pixels, moon, neocities"
+        />
+        <meta name="author" content="dimden" />
+        <link rel="icon" href="https://dimden.dev/favicon.png" />
+        <meta property="og:image" content="https://lune.dimden.dev/7fb22543ae.png" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137155489-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+
+            gtag("config", "UA-137155489-1");
+        </script>
+        <style id="flickering-style">
+            @keyframes flickering {
+                0% {
+                    opacity: 0.54;
+                }
+                2% {
+                    opacity: 0.93;
+                }
+                4% {
+                    opacity: 0.89;
+                }
+                6% {
+                    opacity: 0.4;
+                }
+                8% {
+                    opacity: 1;
+                }
+                10% {
+                    opacity: 0.58;
+                }
+                12% {
+                    opacity: 0.62;
+                }
+                14% {
+                    opacity: 1;
+                }
+                16% {
+                    opacity: 1;
+                }
+                18% {
+                    opacity: 0.61;
+                }
+                20% {
+                    opacity: 0.87;
+                }
+                22% {
+                    opacity: 1;
+                }
+                24% {
+                    opacity: 0.81;
+                }
+                26% {
+                    opacity: 0.46;
+                }
+                28% {
+                    opacity: 1;
+                }
+                30% {
+                    opacity: 0.79;
+                }
+                32% {
+                    opacity: 1;
+                }
+                34% {
+                    opacity: 0.46;
+                }
+                36% {
+                    opacity: 0.39;
+                }
+                38% {
+                    opacity: 0.99;
+                }
+                40% {
+                    opacity: 0.73;
+                }
+                42% {
+                    opacity: 1;
+                }
+                44% {
+                    opacity: 1;
+                }
+                46% {
+                    opacity: 0.96;
+                }
+                48% {
+                    opacity: 0.76;
+                }
+                50% {
+                    opacity: 1;
+                }
+                52% {
+                    opacity: 1;
+                }
+                54% {
+                    opacity: 0.96;
+                }
+                56% {
+                    opacity: 0.69;
+                }
+                58% {
+                    opacity: 0.5;
+                }
+                60% {
+                    opacity: 1;
+                }
+                62% {
+                    opacity: 0.41;
+                }
+                64% {
+                    opacity: 0.44;
+                }
+                66% {
+                    opacity: 1;
+                }
+                68% {
+                    opacity: 0.64;
+                }
+                70% {
+                    opacity: 1;
+                }
+                72% {
+                    opacity: 0.84;
+                }
+                74% {
+                    opacity: 0.56;
+                }
+                76% {
+                    opacity: 1;
+                }
+                78% {
+                    opacity: 0.66;
+                }
+                80% {
+                    opacity: 1;
+                }
+                82% {
+                    opacity: 0.83;
+                }
+                84% {
+                    opacity: 0.58;
+                }
+                86% {
+                    opacity: 0.9;
+                }
+                88% {
+                    opacity: 1;
+                }
+                90% {
+                    opacity: 1;
+                }
+                92% {
+                    opacity: 0.77;
+                }
+                94% {
+                    opacity: 0.42;
+                }
+                96% {
+                    opacity: 0.36;
+                }
+                98% {
+                    opacity: 0.43;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+        </style>
+        <style>
+            #menutd {
+                vertical-align: top !important;
+            }
+
+            body {
+                background-repeat: repeat !important;
+                background-size: 100% !important;
+            }
+            .notice {
+                padding: 10px;
+                margin-bottom: 10px;
+                margin-top: 10px;
+                background-color: rgba(255, 0, 0, 0.1);
+                border-radius: 5px;
+            }
+            h4 {
+                margin: 0;
+            }
+            .tex {
+                width: 180px;
+                height: 170px;
+            }
+            #bg {
+                height: 100vh;
+                object-fit: cover;
+                object-position: top;
+            }
+        </style>
+    </head>
+
+    <body>
+        <img src="https://dimden.dev/images/bg.png" id="bg" />
+        <div id="container">
+            <a href="https://dimden.dev/">
+                <div id="logo">
+                    <img
+                        src="https://dimden.dev/images/letters/D1.png"
+                        class="letter la"
+                        style="margin-right: -12px"
+                        id="logo-d0"
+                    />
+                    <img
+                        src="https://dimden.dev/images/letters/IM.png"
+                        class="letter la"
+                        style="margin-right: -5px"
+                    />
+                    <img
+                        src="https://dimden.dev/images/letters/D2.png"
+                        class="letter la"
+                        style="margin-right: -5px"
+                        id="logo-d"
+                    />
+                    <img src="https://dimden.dev/images/letters/E.png" class="letter la" style="margin-right: -5px" />
+                    <img
+                        src="https://dimden.dev/images/letters/N.png"
+                        class="letter la"
+                        style="margin-left: 2px; margin-bottom: -3px; position: absolute"
+                        id="logo-n"
+                    />
+                </div>
+            </a>
+            <table>
+                <tbody>
+                    <tr>
+                        <!-- MAIN -->
+
+                        <td id="maintd">
+                            <div class="box">
+                                <img
+                                    style="vertical-align: sub; margin-right: 5px"
+                                    width="26"
+                                    height="26"
+                                    src="https://dimden.dev/images/moon.png"
+                                />
+                                <h2 style="display: inline">NavLink Ads!</h2>
+                                <br />
+                                <!-- <div class="notice">
+                                <h4 style="margin-bottom:5px">Notice to webmasters</h4>
+                                <span>
+                                    Since DOKODEMO is going away, suni handed 'ownership' of NavLink Ads to me.<br>
+                                    Right now DOKODEMO redirects to my iframe url, but since it can be deleted entirely, I strongly encourage you to change iframe link from <code>https://dokodemo.neocities.org/navlink.html</code> to <code>https://dimden.neocities.org/navlink/</code> for widget to continue working.
+                                </span>
+                            </div> -->
+                                <p>
+                                    NavLink Ads is an ad system for personal websites. It cycles
+                                    between ads every 30 seconds. It does not host any commercial
+                                    ADs, and it does not cost money to join. Every ad in the system
+                                    is for personal websites only, and preferrably hand coded sites
+                                    (so nothing made with a website builder).
+                                </p>
+                                <p>
+                                    <b>Want your AD in the system?</b> You can contact me on
+                                    <a href="https://discord.gg/yaqzbDBaAA">Discord</a>,
+                                    <a href="https://dimden.dev/cdn-cgi/l/email-protection#48292c252126082c21252c2d26662c2d3e">e-mail</a> or any other
+                                    social. Send me a link to the image as well as your site URL. If
+                                    you don't want your bandwidth being used up, host it somewhere
+                                    like Imgur. Do not use Catbox or Discord, they're not
+                                    reliable. You MUST provide permament link to the image. I will not upload it for you.<br /><br />
+                                    You have to add the widget on your site before applying to
+                                    promote other sites in the network.
+                                    <!-- <strike><a href="https://neocities.org/site/dimden" target="_blank">Also pls follow me on neocities (jkjk, unless?)</a></strike> -->
+                                </p>
+                                <p>
+                                    ADS MUST BE 180x180 PIXELS.<br />
+                                    Images shouldn't include words like "ad" "promo" "advert" etc in
+                                    their titles. Most adblock systems flag it and it'll cause the
+                                    widget to disappear. That includes directories as well.
+                                </p>
+                                <p>
+                                    I also suggest you don't put text too low on the image because
+                                    it might get covered by the "NavLink Ads" box.
+                                </p>
+                                <p>
+                                    Oh, and one last thing, site should have some content. Get
+                                    some cool things, writings, projects, arts you've made or
+                                    whatever, don't submit your website if it's just info about you
+                                    and blog with 1 post saying "hi i made a website", thanks.
+                                </p>
+                                <table style="width: 100%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="50%">
+                                                <p><strong>How the widget will look:</strong></p>
+                                                <iframe
+                                                    width="180"
+                                                    height="180"
+                                                    style="border: none"
+                                                    src="https://dimden.neocities.org/navlink/"
+                                                    name="neolink"
+                                                ></iframe>
+                                            </td>
+                                            <td width="50%">
+                                                <p><strong>Embed it:</strong></p>
+                                                <textarea readonly="" class="tex">
+&lt;iframe width="180" height="180" style="border:none" src="https://dimden.neocities.org/navlink/" name="neolink"&gt;&lt;/iframe&gt;
+                                        </textarea
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="50%">
+                                                <p style="margin-top: 50px">
+                                                    <strong>Experimental smaller version:</strong>
+                                                </p>
+                                                <iframe
+                                                    width="90"
+                                                    height="90"
+                                                    style="border: none"
+                                                    src="https://dimden.neocities.org/navlink/"
+                                                    name="neolink"
+                                                ></iframe>
+                                                <p>
+                                                    You can technically resize the widget to any
+                                                    size as long as it's 1:1, but it might be
+                                                    blurrier. This is a half sized version for tiny
+                                                    sites.
+                                                </p>
+                                            </td>
+                                            <td width="50%">
+                                                <p style="margin-top: 50px">
+                                                    <strong>Embed it:</strong>
+                                                </p>
+                                                <textarea readonly="" class="tex">
+&lt;iframe width="90" height="90" style="border:none" src="https://dimden.neocities.org/navlink/" name="neolink"&gt;&lt;/iframe&gt;
+                                        </textarea
+                                                >
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+
+                        <!-- MENU -->
+
+                        <td id="menutd">
+                            <div class="box">
+                                <img
+                                    style="
+                                        vertical-align: top;
+                                        margin-right: 5px;
+                                        position: relative;
+                                        cursor: pointer;
+                                    "
+                                    src="https://dimden.dev/images/warpstar.png"
+                                    id="kirby"
+                                />
+                                <h2 style="display: inline">Stars</h2>
+                                <br /><br />
+                                <a class="navlink" href="https://dimden.dev/" id="home-link">✩ Home</a><br>
+<a class="navlink" href="https://dimden.dev/about.html" id="about-link">✩ About me<!-- <span style="color:red;vertical-align: super;font-size: 12px;margin-left:3px">new!</span> --></a><br>
+<a class="navlink" href="https://diary.dimden.dev/">✩ Diary</a><br>
+<a class="navlink" href="https://album.dimden.dev/">✩ Photo Album</a><span id="new-photos"></span><br>
+<a class="navlink" href="https://dimden.dev/blogindex">✩ Blog</a><br>
+<a class="navlink"target="_blank" href="https://neocities.org/site/dimden">✩ Neocities page</a><br>
+<b><a class="navlink" target="_blank" href="https://discord.gg/yaqzbDBaAA">✩ Discord</a></b> <i style="color:gray"><-- join!!</i><br>
+<a class="navlink" href="https://dimden.atabook.org/">✩ Guestbook</a><br>
+<a class="navlink" target="_blank" href="https://twitter.com/dimden">✩ Twitter</a><br>
+<a class="navlink" target="_blank" href="https://dimdeneff.tumblr.com/">✩ Tumblr</a><br>
+<a class="navlink" target="_blank" href="https://github.com/dimdenGD">✩ GitHub</a><br>
+<a class="navlink" target="_blank" href="https://www.last.fm/user/dimdendev">✩ Last.fm</a><br>
+<a class="navlink" href="https://dimden.dev/donate">✩ Donate <img src="https://dimden.dev/images/smoldimden.png" style="vertical-align: middle; float:right; margin-top:-9px;margin-left:2px"></a><br>
+<a class="navlink" href="https://mood.dimden.dev/">✩ Mood tracker <img id="mood-emoji" style="vertical-align: bottom;" src="https://mood.dimden.dev/fbemoji/neutral.png"></a><br>
+<a class="navlink" href="https://dimden.dev/grillbys/">✩ Grillby's</a><br>
+<a class="navlink" href="https://dimden.dev/navlinkads">✩ NavLink Ads</a><br>
+<a class="navlink" href="https://dimden.dev/gallery">✩ OC Gallery</a><br>
+<a class="navlink" href="https://dimden.dev/cdn-cgi/l/email-protection#78191c151116381c11151c1d16561c1d0e">✩ E-mail <img src="https://dimden.dev/images/mail.png" style="vertical-align: bottom;margin-left: 3px;"></a><br>
+                            </div>
+                            <div class="box centerbox" style="margin-top: 10px">
+                                <img src="https://dimden.dev/images/88x31.gif" /><br /><br />
+                                <textarea readonly>
+<a href="https://dimden.dev/"><img src="https://dimden.dev/images/88x31.gif"></a></textarea
+                                ><br />
+                                <span style="color: gray; margin-top: 5px; display: block"
+                                    >DO hotlink my button!</span
+                                >
+                            </div>
+                            <div class="box" style="margin-top: 10px">
+                                <iframe
+                                    style="border: none"
+                                    src="https://dimden.dev/hc"
+                                    name="hitcounter"
+                                    width="180"
+                                    height="52"
+                                ></iframe>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <footer>
+                <span id="copyright">(c) 2019-2024 dimden. All Rights Reserved.</span><br>
+<a href="https://dimden.dev/cdn-cgi/l/email-protection#1071747d797e5074797d74757e3e747566"><span class="__cf_email__" data-cfemail="5f3e3b3236311f3b36323b3a31713b3a29">[email&#160;protected]</span></a>
+
+            </footer>
+            <iframe src="https://dimden.neocities.org/iframe.html" style="display: none"></iframe>
+            <br />
+        </div>
+        <iframe src="https://dimden.neocities.org/iframe.html" style="display: none"></iframe>
+    <script data-cfasync="false" src="https://dimden.dev/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+
+<!-- Mirrored from dimden.dev/navlinkads/ by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:48 GMT -->
+</html>

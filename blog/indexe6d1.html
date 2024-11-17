@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+
+<!-- Mirrored from dimden.dev/blog/?id=2-chip8js-my-first-emulator by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:35 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <meta name="description" content="My website and blog.">
+    <meta name="keywords" content="dimden, JS, JavaScript, Eff the cops, discord, nes, emulators">
+    <meta name="author" content="dimden">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-137155489-1"></script>
+<!-- <script async src="https://arc.io/widget.min.js#PtWkKp1P"></script> -->
+<!-- <script data-ad-client="ca-pub-8494581286071468" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-137155489-1');
+</script>
+
+    <link rel="stylesheet" href="../stylesheet.css">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+    <style>
+        #content {
+            font-family: "MS UI Gothic", Tahoma, sans-serif !important;
+            font-size: 105%;
+        }
+        #date {
+            color: #2e8579;
+            font-family: "MS Gothic", Tahoma, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<!--<h1 id="logo" onclick="window.location.href =`/`;">DIM<letter id="logo-d">D</letter>E<letter id="logo-n">N</letter></h1>-->
+<a href="../index.html">
+    <img id="logo" src="../logo.png">
+</a>
+<script src="../logo.js"></script>
+<hr>
+<!--BLOG-->
+<div id="blog"><title>chip8js - my first emulator - DIMDEN</title>
+<link rel="stylesheet" href="../highlight/styles/atom-one-dark.css">
+<script src="../highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<h1>chip8js - my first emulator</h1>
+<span id="date">Posted on Sunday, 12th of May 2019</span>
+<br>
+<br>
+<span id="content">
+    Few weeks ago I started to make my first emulator - chip8js.<br>
+    <br>
+    I never did emulators before, and that was really a good experience!
+    Actually, I wanted to make NES emulator firstly, but It's too hard for me, because I never did emulators before.
+    <br><br>
+    CHIP-8 is perfect for first emulator project. Literally almost everyone doing it first. So, after some digging in google,
+    I decided to start. CHIP-8 has less than 50 opcodes, and It didn't take a while to make them.
+    I'm using JavaScript, but if you want to do emulator too, you can use any other language.
+    To make CHIP-8, we need to create input (keyboard), output (screen) and CPU.
+    So, let's start!<br>
+    <br>
+    First off, we need memory. CHIP-8 can hold up to 4096 bytes. In memory there is interpreter itself, fonts, and loaded program.
+    In JS it looks like this:
+    <br>
+    <pre><code class="js">
+let memory = new ArrayBuffer(0x1000); // 4096
+this.memory = new Uint8Array(memory); // My emulator is class, so everything will be able to easily edit the memory.
+    </code></pre>
+    <br>
+    CHIP-8 has 64x32 display, 16 key inputs and sound buzzer. The display is just array of pixels, that can be on or off.
+    <br>
+    <pre><code class="js">
+this.screen = new Array(64*32);
+let should_draw = false; // is draw requested or no
+this.keypress = {};
+this.keywait = false; // is waiting for key input
+let buzz = new Audio('buzz.wav'); // you can find the buzz sound in my GitHub repo
+    </code></pre>
+    The CHIP-8 has 16 8bit registers. They are used to store values for operations. VX, VY, VF. VF register is used for the flags, and should not be used in programs.
+    <pre><code class="js">
+this.reg = new Array(16);
+    </code></pre>
+    It also has 2 timer registers, that we'll decrement per cycle.
+    <pre><code class="js">
+this.delay_t = 0;
+this.sound_t = 0;
+    </code></pre>
+    It has index register and program counter, and they are 16bit.
+    There is also a stack and stack pointer, which includes the address of the topmost stack element. The stack has at most 16 elements in it at any given time.
+    <pre><code class="js">
+this.index = 0;
+this.pc = 0x200;
+this.stack = new Array(16);
+this.sp = 0;
+    </code></pre>
+    Why 0x200? It's because first 512 bytes are always was used by interpreter and fonts, and all programs start from 0x200.
+
+    <br><br>
+    For display, I use canvas, you can use anything that you want. I like canvas, and I can easily use it in web.
+    To make key inputs work, we need to make event listener for keypress, and write 1 on keydown, and 0 on keyup. Nothing really hard:
+    <pre><code class="js">
+let keys = {
+        1: 0x1,
+        2: 0x2,
+        3: 0x3,
+        4: 0xc,
+        Q: 0x4,
+        W: 0x5,
+        E: 0x6,
+        R: 0xd,
+        A: 0x7,
+        S: 0x8,
+        D: 0x9,
+        F: 0xe,
+        Z: 0xa,
+        X: 0,
+        C: 0xb,
+        V: 0xf
+    };
+
+document.addEventListener("keydown", e => {
+    if(keys[e.key.toUpperCase()] === undefined) return; // check is key exists
+    console.log("Key press: " + e.key);
+    this.keypress[keys[e.key.toUpperCase()]] = 1;
+    if(this.keywait) this.keywait = false;
+});
+document.addEventListener("keyup", e => {
+    if(keys[e.key.toUpperCase()] === undefined) return; // check is key exists
+    console.log("Key release: " + e.key);
+    this.keypress[keys[e.key.toUpperCase()]] = 0;
+    if(this.keywait) this.keywait = false;
+});
+    </code></pre>
+    Now we need run function:
+        <pre><code class="js">
+this.run = (binary, options) => {
+    this.init();
+    // Now we need to load all ROM binary to memory:
+    for(let i = 0; i < binary.length; i++) this.memory[i+0x200] = binary[i].charCodeAt(0); // get char from symbol (ord)
+    let t = setInterval(() => {
+        if(this.pause) return;
+        if(this.exit) return clearInterval(t);
+        this.cycle(); // execute opcode
+        this.draw(); // draw on screen
+    }, 6 /*ms*/);
+};
+        </code></pre>
+        Let's look on the code. First off, we need to initialize our emulator - set everything to zero, reset everything.
+        We got the binary from the uploaded ROM, so we need to load content of ROM to memory (from 0x200).
+        And after that, we start the "loop". Every cycle we check is emulator paused and should it exit. You can add own checks there.
+        And we reach the cycle that executes the opcode and if we need to draw, we... draw on screen. And repeat, repeat, repeat!
+        <br>
+        CHIP-8 has built-in font. It should be loaded into memory, and before 0x200. Let's make an array, and put it in memory on init.
+        <pre><code class="js">
+let fonts = [0xF0, 0x90, 0x90, 0x90, 0xF0,// 0
+            0x20, 0x60, 0x20, 0x20, 0x70, // 1
+            0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+            0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+            0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+            0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+            0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+            0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+            0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+            0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+            0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+            0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+            0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+            0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+            0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+            0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+],
+        </code></pre>
+    Yes, I know what you want to ask - how the hell it should work? I had same question, but with this table, you'll understand it:
+        <br>
+        <br>
+        <span style="font-size: 20px;font-family: monospace">
+            "0"<br>
+        binary -  hex<br>
+        <span style="color:#1db954">1111</span>0000  0xF0<br>
+        <span style="color:#1db954">1</span>00<span style="color:#1db954">1</span>0000  0x90<br>
+        <span style="color:#1db954">1</span>00<span style="color:#1db954">1</span>0000  0x90<br>
+        <span style="color:#1db954">1</span>00<span style="color:#1db954">1</span>0000  0x90<br>
+        <span style="color:#1db954">1111</span>0000  0xF0<br>
+        </span>
+        <br>
+        Binary forms "0" symbol!<br>
+        Let's make our init function, it just should reset everything and put fonts in memory.
+        <pre><code class="js">
+this.init = () => {
+    clear(); // clear the canvas function
+    this.reg = new Array(16);
+    this.screen = new Array(64 * 32);
+    this.stack = new Array(16);
+    this.opcode = 0;
+    this.index = 0;
+    this.pc = 0x200;
+    this.sp = 0;
+    this.pause = document.getElementById("pause").checked; // my pause checkbox
+    delay_t = 0;
+    sound_t = 0;
+    should_draw = false;
+
+    // loading font into memory
+    for (let i = 0; i < 80; i++) this.memory[i] = fonts[i];
+};
+        </code></pre>
+    <br>
+    Now, to the hardest part - <b>cycle</b>.
+    It's biggest, and most boring part. Let's make "skeleton" of cycle, and only after that make opcodes.
+    Each cycle basically looks like this:
+    <pre><code class="js">
+this.funcs = {}; // TODO: create opcodes
+let that = this; // to access this from function
+
+this.cycle = () => {
+    this.opcode = (that.memory[that.pc] << 8) | that.memory[that.pc + 1]; // getting the opcode from memory
+    let eop = this.opcode & 0xf000; // extracting opcode
+    console.log(`[${that.pc}] Opcode: ${op}`);
+    that.pc += 2; // going to the next instruction
+
+    // getting vx and vy registers
+    this.vx = (this.opcode & 0x0f00) >> 8;
+    this.vy = (this.opcode & 0x00f0) >> 4;
+
+    // executing!
+
+    try {
+        that.funcs[eop]();
+    } catch (e) {
+        throw new Error("Unknown instruction: " + eop);
+    };
+
+    // decrementing the timers
+
+    if(delay_t > 0) delay_t--;
+    if(sound_t > 0) {
+        sound_t--;
+        if(sound_t === 0) buzz.play(); // play sound
+    }
+};
+    </code></pre>
+        And now, our skeleton for cycle is done! It's time to make final steps - implementing opcodes and draw function!
+        Opcode - is basically instruction that we need to execute. Each opcode is 2 bytes long. We are moving our program counter
+        and executing all the opcodes. Now, we need to fill our this.funcs with all opcodes. It's pretty long, I won't show how I made
+        all the opcodes, you can see it in my GitHub repo, but I'll show few of these. Look at <a
+        href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#0.0">Cowgod's Chip-8 Technical Reference</a> for all opcodes and CHIP-8 information.
+        <br>
+        Let's implement our first opcode!
+        CLS (00E0) - Clear screen opcode:
+        <pre><code class="js">
+this.funcs = {
+    0x00e0: () => {
+        that.screen = new Array(64*32); // make screen blank again
+        should_draw = true;
+    }//,
+    // and now we just add here new and new opcodes.
+};
+        </code></pre>
+        For example, let's implement another opcode - <i>3xkk</i>. It skips next instruction if VX == kk. Nothing too hard!
+        <pre><code class="js">
+this.funcs = {
+ /* ... */
+    0x3000: () => {
+        if(that.reg[that.vx] === (that.opcode & 0x00ff)) that.pc += 2;
+    }
+}
+        </code></pre>
+        Now, it's time to make one of the hardest functions - draw function!
+        There is 2 opcodes that draws something on screen - FZ29 and DXYN. They both set "should_draw" to true, so let's make our draw function.
+        <pre><code class="js">
+    this.draw = () => {
+        if(!should_draw) return; // only on should_draw!
+        should_draw = false;
+        clear(); // clear the screen func
+        let i = 0;
+        while(i < 2048) {
+            if(this.screen[i] === 1) {
+                let x = (i%64), // 64 width
+                    y = Math.floor((i / 32)/2); // 32 height
+                // Now, draw pixel. tx - context of canvas
+                tx.fillStyle = "rgb(255, 255, 255)";
+                tx.fillRect(x, y, 1, 1);
+            }
+            i++;
+        }
+    };
+        </code></pre>
+        Done! Now, if you implemented all instructions it should work! If you will follow the documentation, implementing opcodes
+        won't be hard. Also, when you make upload ROM function, don't forget to read it as binary(!!!), because I was reading it
+        incorrectly, and I almost gave up after few days of trying to fix it.
+        <br>
+        There is some <a href="https://github.com/corax89/chip8-test-rom/blob/master/test_opcode.ch8">test ROMS</a>, and they really help a lot!
+        <br>
+        <br>
+        Check out my online chip8 emulator - <a href="../chip8/index.html">https://dimden.dev/chip8</a>
+        <br>
+        And GitHub repo - <a href="https://github.com/dimdenGD/chip8js">https://github.com/dimdenGD/chip8js</a>
+    </span>
+<br><br>
+</div>
+<div id="footer"><div id="find">
+    <h2>Find me there</h2>
+    <a href="../index.html">* Home page</a><br />
+    <a href="https://discord.gg/yaqzbDBaAA">* Discord</a><br />
+    <a href="https://twitter.com/d1mden">* Twitter</a><br />
+    <a href="https://github.com/dimdenGD">* GitHub</a><br />
+    <a href="https://www.patreon.com/dimdendev"
+        >* Patreon <img src="../smoldimden.png" style="vertical-align: middle" /></a
+    ><br />
+    <a href="../cdn-cgi/l/email-protection.html#49282d242027092d20242d2c27672d2c3f">* <span class="__cf_email__" data-cfemail="1c7d787175725c7875717879723278796a">[email&#160;protected]</span></a>
+</div>
+<div id="about">
+    <h2>About me</h2>
+    <span
+        >I code random stuff sometimes.<br />
+        always bored!!<br /><br />
+        © dimden 2019-2024</span
+    >
+</div>
+<div id="projects">
+    <h2>Public projects</h2>
+    <a href="https://whispy.org/">* Whispy</a><br />
+    <a href="https://github.com/dimdenGD/OldTwitter">* OldTwitter</a><br />
+    <a href="https://github.com/dimdenGD/OldTweetDeck">* OldTweetDeck</a><br />
+    <a href="https://nekoweb.org/">* Nekoweb</a><br />
+    <a href="../grillbys/index.html">* Grillby's</a><br />
+    <a
+        href="https://chrome.google.com/webstore/detail/html-comments-finder/opijbipenamgfcnhfpklbamhaanhhpda"
+        >* HTML Comments Finder</a
+    ><br />
+    <a href="../puzzle3/index.html">* Puzzle</a><br />
+    <!-- <a href="/codelab">* Codelab</a><br> -->
+    <a href="https://utix.dev/">* Utix</a><br />
+    <a href="../chip8/index.html">* chip8js</a><br />
+    <!-- <a href="/Calculator/example">* Calculator Engine</a><br> -->
+    <!-- <a href="/owop">* OWOP</a><br> -->
+    <!-- <a href="/message">* The Message</a><br> -->
+    <a href="https://opm.dimden.dev/">* OPM2</a><br />
+    <!-- <a href="/gallery">* Gallery</a><br> -->
+    <a href="../cyberbiology/index.html">* Cyberbiology</a><br />
+    <!-- <a href="https://blackchat.glitch.me/">* Blackchat</a><br /> -->
+    <a href="https://utix-web.dimden.dev/">* Utix Website</a><br />
+    <!-- <a href="https://dimden.dev/martingale">* Martingale</a><br> -->
+    <!-- <a href="/ears">The Secret inside you</a> -->
+    <!-- <a href="https://twitter.com/TwittTetris">* Twitter Plays Tetris</a><br>
+            <a href="https://bots.moe/bot/912731633529008139">* Emojimix</a><br> -->
+</div>
+<div></div>
+</div>
+<iframe src="https://dimden.neocities.org/iframe.html" referrerpolicy="no-referrer" style="display:none"></iframe>
+<script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+
+<!-- Mirrored from dimden.dev/blog/?id=2-chip8js-my-first-emulator by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 16:24:35 GMT -->
+</html>
