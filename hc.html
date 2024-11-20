@@ -1,11 +1,21 @@
-<!DOCTYPE html>
 <html lang="en">
-    
-<head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Hitcounter</title>
+    <body>
+        <div style="float: left">
+            <b class="text">Visits:</b><br />
+            <b class="text">Uniq. Visitors:</b><br />
+            <b class="text">On-site:</b>
+        </div>
+        <div style="position: fixed; right: 0">
+            <span class="counter green" id="hits">441300</span><br />
+            <span class="counter green" id="visitors">217936</span><br />
+            <span class="counter green" id="online">01</span><br />
+        </div>
+        <div style="position: fixed; right: 0; z-index: -1">
+            <span class="counter gray">00000000</span><br />
+            <span class="counter gray">00000000</span><br />
+            <span class="counter gray">00000000</span>
+        </div>
+
         <style>
             :root {
                 --font: "MS UI Gothic";
@@ -44,23 +54,7 @@
                 font-size: var(--font-size);
             }
         </style>
-    </head>
-    <body>
-        <div style="float: left">
-            <b class="text">Visits:</b><br />
-            <b class="text">Uniq. Visitors:</b><br />
-            <b class="text">On-site:</b>
-        </div>
-        <div style="position: fixed; right: 0">
-            <span class="counter green" id="hits">441300</span><br />
-            <span class="counter green" id="visitors">217936</span><br />
-            <span class="counter green" id="online">01</span><br />
-        </div>
-        <div style="position: fixed; right: 0; z-index: -1">
-            <span class="counter gray">00000000</span><br />
-            <span class="counter gray">00000000</span><br />
-            <span class="counter gray">00000000</span>
-        </div>
+        
     </body>
 
 </html>
