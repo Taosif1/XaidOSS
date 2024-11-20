@@ -54,7 +54,7 @@
         <div style="position: fixed; right: 0">
             <span class="counter green" id="hits">441300</span><br />
             <span class="counter green" id="visitors">217936</span><br />
-            <span class="counter green" id="online">20</span><br />
+            <span class="counter green" id="online">01</span><br />
         </div>
         <div style="position: fixed; right: 0; z-index: -1">
             <span class="counter gray">00000000</span><br />
@@ -109,7 +109,7 @@
             }, 10);
 
             setInterval(() => {
-                fetch("https://dimden.dev/services/hc/raw")
+                fetch("#")
                     .then((i) => i.text())
                     .then((i) => {
                         let [hits, visitors, online] = i.split(",");
